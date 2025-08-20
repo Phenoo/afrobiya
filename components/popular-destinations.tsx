@@ -58,7 +58,7 @@ const destinations = [
 
 export function PopularDestinations() {
   return (
-    <section className="pb-16 pt-48 bg-[#F8F9FA]  px-6">
+    <section className="pb-16 pt-[700px] lg:pt-48 bg-[#F8F9FA]  px-6">
       <div className="max-w-7xl mx-auto">
         <Carousel
           opts={{
@@ -70,7 +70,7 @@ export function PopularDestinations() {
             {destinations.map((destination, index) => (
               <CarouselItem
                 key={index}
-                className="md:basis-1/4 lg:basis-1/6 sm:basis-1/2"
+                className="md:basis-1/4 lg:basis-1/6 sm:basis-1/2 p-4"
               >
                 <div
                   key={index}

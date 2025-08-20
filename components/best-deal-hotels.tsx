@@ -65,12 +65,12 @@ export function BestDealHotels() {
           {hotels.map((hotel) => (
             <Card
               key={hotel.id}
-              className=" shadow-lg hover:shadow-xl gap-0 space-x-0 rounded-3xl overflow-hidden flex-row p-0 transition-shadow"
+              className=" shadow-lg hover:shadow-xl gap-0 space-x-0 rounded-3xl overflow-hidden  flex-col sm:flex-row p-0 transition-shadow"
               style={{
                 backgroundImage: `url(${hotel.image || "/placeholder.svg"})`,
               }}
             >
-              <div className="relative w-1/2">
+              <div className="relative w-full md:w-1/2">
                 <Image
                   src={hotel.image || "/placeholder.svg"}
                   alt={hotel.name}
@@ -88,7 +88,7 @@ export function BestDealHotels() {
                 </div>
               </div>
 
-              <div className="p-4 bg-white rounded-3xl w-1/2 flex justify-between flex-col">
+              <div className="p-4 bg-white rounded-3xl w-full md:w-1/2 flex justify-between flex-col">
                 <h3 className="text-xl font-semibold text-[#333333] mb-2">
                   {hotel.name}
                 </h3>

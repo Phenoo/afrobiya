@@ -31,15 +31,17 @@ export default function HotelAmenities({
 
   return (
     <div className={`${className}`}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
         {Object.entries(amenitiesData).map(([category, items]) => (
           <div key={category} className="space-y-4">
-            <h3 className="text-base font-medium text-[#4D4D4D]">{category}</h3>
+            <h3 className="text-sm md:text-base font-medium text-[#4D4D4D]">
+              {category}
+            </h3>
             <ul className="space-y-3">
               {items.map((item, index) => (
                 <li
                   key={index}
-                  className="text-[#666666] text-sm leading-relaxed"
+                  className="text-[#666666] text-xs md:text-sm leading-relaxed"
                 >
                   {item}
                 </li>
@@ -47,11 +49,6 @@ export default function HotelAmenities({
             </ul>
           </div>
         ))}
-      </div>
-
-      {/* Transportation section header */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold text-[#4D4D4D]">Transportation</h3>
       </div>
     </div>
   );

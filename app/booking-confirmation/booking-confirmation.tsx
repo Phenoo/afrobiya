@@ -114,7 +114,7 @@ export function BookingConfirmation() {
         {/* Hotel Information */}
         <Card className="mb-6 shadow-none border border-[#E6E6E6]">
           <CardContent className="p-6">
-            <h2 className="text-2xl font-bold text-[#333333] mb-2">
+            <h2 className="text-xl  md:text-2xl font-bold text-[#333333] mb-2">
               The Lagos Continental Hotel
             </h2>
             <div className="flex items-center text-sm text-[#808080] mb-2">

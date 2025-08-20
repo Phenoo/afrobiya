@@ -1,5 +1,4 @@
-import { Star, ThumbsUp, ThumbsDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 interface Review {
@@ -91,10 +90,39 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 export function HotelReviews() {
+  const ratingData = [
+    { stars: 5, percentage: 85 },
+    { stars: 4, percentage: 15 },
+    { stars: 3, percentage: 0 },
+    { stars: 2, percentage: 0 },
+    { stars: 1, percentage: 0 },
+  ];
   return (
     <div className="space-y-6">
       {/* Individual Reviews */}
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl font-medium">4.0</span>
+            <Star className="h-6 w-6 fill-[#FC5D01] text-[#FC5D01]" />
+          </div>
+          <p className="text-[#808080] mb-4">53 ratings</p>
+
+          {/* Rating Breakdown */}
+          <div className="space-y-2">
+            {ratingData.map((rating) => (
+              <div key={rating.stars} className="flex items-center gap-2">
+                <span className="text-sm w-2">{rating.stars}</span>
+                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#FC5D01] rounded-full"
+                    style={{ width: `${rating.percentage}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
         {reviews.map((review) => (
           <Card key={review.id} className="p-4 border-none shadow-none">
             <div className="flex items-start gap-4">
@@ -122,13 +150,6 @@ export function HotelReviews() {
             </div>
           </Card>
         ))}
-      </div>
-
-      {/* Load More Button */}
-      <div className="text-center">
-        <Button variant="outline" className="px-8 bg-transparent">
-          Load More Reviews
-        </Button>
       </div>
     </div>
   );

@@ -193,11 +193,11 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex justify-between mt-10">
+        <div className="flex justify-center gap-4 md:justify-between flex-col-reverse items-center w-full md:flex-row mt-10">
           <p className="text-sm">
             © 2024 Afroliyah Travels. All rights reserved.
           </p>
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center text-sm">
             <h3 className="font-medium">Follow Us</h3>
             <a href="#" className="p-2 rounded-full border border-white">
               <Instagram className="h-4 w-4" />

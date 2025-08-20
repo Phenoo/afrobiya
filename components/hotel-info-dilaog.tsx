@@ -22,7 +22,7 @@ export default function HotelPoliciesDialog({
 }: HotelPoliciesDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="md:max-w-4xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="md:max-w-4xl max-h-[700px] overflow-y-auto">
         <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <DialogTitle className="text-xl font-semibold">
             Hotel Policies

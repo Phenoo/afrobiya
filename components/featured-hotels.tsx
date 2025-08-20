@@ -32,7 +32,7 @@ export function FeaturedHotels() {
             Picked by Aforliyah
           </h2>
           <p className="text-[#808080] textsm">
-            Quality as judged by Aforliyah!
+            Quality as judged by Aforliyah
           </p>
         </div>
 

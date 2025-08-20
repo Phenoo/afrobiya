@@ -26,8 +26,8 @@ export function PhotoGallery() {
               <Image
                 src={image.src || "/placeholder.svg"}
                 alt={image.alt}
-                width={200}
-                height={200}
+                width={150}
+                height={150}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
               />
             </div>

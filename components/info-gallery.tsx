@@ -59,26 +59,13 @@ export function PhotoInfo({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="md:max-w-4xl w-full h-[90vh] p-0 bg-white rounded-2xl overflow-y-hidden">
+      <DialogContent className="md:max-w-4xl w-full h-[630px] p-0 bg-white rounded-2xl overflow-y-hidden">
         {/* Header with navigation */}
-        <DialogTitle className="px-4 pt-4 opacity-0 hidden">
+        <DialogTitle className="px-4  opacity-0 hidden">
           {hotelName}
         </DialogTitle>
-        <div className="flex items-center justify-between p-4 bg-white">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={goToPrevious}
-              className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5 text-[#808080]" />
-            </button>
-            <button
-              onClick={goToNext}
-              className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <ChevronRight className="w-5 h-5 text-[#808080]" />
-            </button>
-          </div>
+        <div className="flex items-center justify-between pt-4 px-4 bg-white">
+          <div className="flex items-center gap-2"></div>
           <button
             onClick={onClose}
             className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -89,7 +76,7 @@ export function PhotoInfo({
 
         {/* Main image */}
         <div className="flex-1 px-4">
-          <div className="relative w-full h-[60vh] rounded-lg overflow-hidden">
+          <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
             <Image
               src={hotelImages[currentImageIndex].src || "/placeholder.svg"}
               alt={hotelImages[currentImageIndex].alt}
@@ -99,29 +86,43 @@ export function PhotoInfo({
           </div>
         </div>
 
-        <ScrollArea className="w-[850px]  whitespace-nowrap">
-          <div className="flex w-max space-x-4 p-4">
-            {hotelImages.map((image, index) => (
-              <button
-                key={index}
-                onClick={() => goToImage(index)}
-                className={`relative w-[180px] h-[10vh] rounded-lg overflow-hidden border-2 transition-all ${
-                  index === currentImageIndex
-                    ? "border-blue-500 ring-2 ring-blue-200"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <Image
-                  src={image.src || "/placeholder.svg"}
-                  alt={image.alt}
-                  fill
-                  className="object-cover object-top"
-                />
-              </button>
-            ))}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+        <div className="flex items-center gap-4 px-4">
+          <button
+            onClick={goToPrevious}
+            className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5 text-[#808080]" />
+          </button>
+          <ScrollArea className="w-[750px]  whitespace-nowrap">
+            <div className="flex w-max space-x-4 p-4">
+              {hotelImages.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToImage(index)}
+                  className={`relative w-[180px] h-[100px] rounded-lg overflow-hidden border-2 transition-all ${
+                    index === currentImageIndex
+                      ? "border-blue-500 ring-2 ring-blue-200"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <Image
+                    src={image.src || "/placeholder.svg"}
+                    alt={image.alt}
+                    fill
+                    className="object-cover object-top"
+                  />
+                </button>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+          <button
+            onClick={goToNext}
+            className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
+          >
+            <ChevronRight className="w-5 h-5 text-[#808080]" />
+          </button>
+        </div>
       </DialogContent>
     </Dialog>
   );

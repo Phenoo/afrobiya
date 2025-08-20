@@ -59,13 +59,13 @@ const CurrencyNationalitySelector = () => {
 
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Currency Dropdown */}
-        <div className="relative flex-1 flex gap-2 items-center border border-gray-500 divide-x rounded-lg">
+        <div className="relative flex-1 divide-[#333] flex gap-2 items-center border border-gray-500 divide-x rounded-lg">
           <Select
             onValueChange={(e) => {
               setSelectedCurrency(e);
             }}
           >
-            <SelectTrigger className="w-4/5 outline-0 text-xs border-none">
+            <SelectTrigger className="w-full outline-0 text-xs border-none">
               <SelectValue placeholder="Select a currency" />
             </SelectTrigger>
             <SelectContent>
@@ -82,7 +82,7 @@ const CurrencyNationalitySelector = () => {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <div className="bg-white  rounded-lg p-2 text-xs  flex items-center justify-center">
+          <div className="border-l border-l-[#333] h-full text-xs  min-w-16 flex items-center justify-center">
             <span className="text-[#666666] font-medium">
               {selectedCurrencyData?.code} {selectedCurrencyData?.symbol}
             </span>
@@ -94,8 +94,8 @@ const CurrencyNationalitySelector = () => {
         {/* Flag Icon */}
 
         {/* Nationality Dropdown */}
-        <div className="relative flex-1 flex gap-2 items-center border border-gray-500 divide-x rounded-lg">
-          <div className="bg-white  rounded-lg p-2 min-w-16 flex items-center justify-center">
+        <div className="relative flex-1 divide-[#333] flex gap-2 items-center border border-gray-500 divide-x rounded-lg">
+          <div className="  p-2 min-w-16 flex items-center justify-center">
             <span className="text-2xl">{selectedNationalityData?.flag}</span>
           </div>
           <Select
@@ -103,7 +103,7 @@ const CurrencyNationalitySelector = () => {
               setSelectedNationality(e);
             }}
           >
-            <SelectTrigger className="w-[180px] border-none">
+            <SelectTrigger className="w-full border-none ">
               <SelectValue placeholder="Select a country" />
             </SelectTrigger>
             <SelectContent>

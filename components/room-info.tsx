@@ -164,7 +164,7 @@ export default function RoomInfoSheet({
 
           {/* Room Details */}
           <div className="py-6 space-y-2">
-            <div className="flex items-start px-6 justify-between">
+            <div className="flex items-start flex-col gap-6 md:flex-row px-6 justify-between">
               <div className="space-y-2">
                 <h1 className="text-xl font-medium">{room.name}</h1>
                 <div className="flex items-center text-sm gap-2 text-gray-600">
@@ -199,7 +199,7 @@ export default function RoomInfoSheet({
                 Room Features and Facilities
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
                 {roomFeatures.map((category) => (
                   <div key={category.category} className="space-y-2">
                     {category.items.map((item, index) => (

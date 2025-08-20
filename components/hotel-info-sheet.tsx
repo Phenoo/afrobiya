@@ -10,19 +10,34 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Heart, Star } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { PhotoGallery } from "./photo-gallery";
-import { Dialog, DialogContent } from "./ui/dialog";
+
 import { PhotoInfo } from "./info-gallery";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import HotelAmenities from "./hotel-amenities";
 import { HotelReviews } from "./hotel-reviews";
 import { HotelMap } from "./hotel-map";
+import { Card } from "./ui/card";
 interface HotelInfoSheetProps {
   isOpen: boolean;
   onClose: () => void;
   hotelName: string;
 }
+
+const StarRating = ({ rating }: { rating: number }) => {
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`h-4 w-4 ${
+            star <= rating ? "fill-[#FC5D01] text-[#FC5D01]" : "text-gray-300"
+          }`}
+        />
+      ))}
+    </div>
+  );
+};
 
 export default function HotelInfoSheet({
   isOpen,
@@ -30,7 +45,7 @@ export default function HotelInfoSheet({
   hotelName,
 }: HotelInfoSheetProps) {
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
-
+  const [tab, setTab] = useState("overview");
   const amenities = [
     "Swimming Pool",
     "Free Internet Access",
@@ -117,10 +132,12 @@ export default function HotelInfoSheet({
 
             {/* Hotel Details */}
             <div className="mb-6">
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start flex-col gap-4 md:flex-row justify-between mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h1 className="text-2xl font-bold">{hotelName}</h1>
+                    <h1 className="text-lg md:text-2xl font-bold">
+                      {hotelName}
+                    </h1>
                     <Heart className="h-6 w-6 text-gray-400" />
                   </div>
                   <p className="text-[#808080] mb-2">4-Star Hotel</p>
@@ -132,24 +149,35 @@ export default function HotelInfoSheet({
                     </span>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="md:text-right">
                   <p className="text-sm text-[#808080] mb-1">Starting at</p>
-                  <p className="text-3xl font-bold text-blue-600">$95</p>
-                  <p className="text-sm text-[#808080]">per night</p>
+                  <p className="text-3xl font-bold text-blue-600">
+                    $95{" "}
+                    <span className="font-normal md:hidden text-sm text-[#808080]">
+                      per night
+                    </span>
+                  </p>
+                  <p className="text-sm text-[#808080] hidden md:flex">
+                    per night
+                  </p>
                 </div>
               </div>
 
               {/* Navigation Tabs */}
 
-              <Tabs defaultValue="overview" className="mb-6 w-full">
-                <TabsList>
+              <Tabs defaultValue={tab} className="mb-6 w-full">
+                <TabsList className="flex-wrap items-start">
                   {tabs.map((tab) => (
-                    <TabsTrigger key={tab.id} value={tab.id}>
+                    <TabsTrigger
+                      key={tab.id}
+                      value={tab.id}
+                      onClick={() => setTab(tab.id)}
+                    >
                       {tab.label}
                     </TabsTrigger>
                   ))}
                 </TabsList>
-                <hr className="mt-4" />
+                <hr className=" mt-8 md:mt-4" />
                 <TabsContent value="overview">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Rating Section */}
@@ -177,6 +205,35 @@ export default function HotelInfoSheet({
                           </div>
                         ))}
                       </div>
+                      <Card className="p-4 border-none shadow-none">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-1">
+                            <div className="flex flex-col mb-2">
+                              <div className="text-right">
+                                <StarRating rating={5} />
+                              </div>
+                              <div className="flex gap-4 items-center">
+                                <h5 className=" text-[#666666] text-sm">
+                                  Emma Williams
+                                </h5>
+                                <div className="flex items-center gap-2 text-sm text-[#666666]">
+                                  <p className="text-sm text-[#666666] mt-1">
+                                    2 weeks ago
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <p className="text-gray-700 text-sm mb-4 leading-relaxed">
+                              We had an amazing family vacation at this hotel.
+                              The kids loved the pool area and the staff was
+                              very accommodating with our requests. The rooms
+                              were comfortable and the housekeeping service was
+                              impeccable. We'll definitely be back!
+                            </p>
+                          </div>
+                        </div>
+                      </Card>
                     </div>
 
                     {/* Top Amenities */}
@@ -188,12 +245,15 @@ export default function HotelInfoSheet({
                         <Button
                           variant="link"
                           className="text-orange-600 p-0 h-auto"
+                          onClick={() => {
+                            setTab("amenities");
+                          }}
                         >
                           See all amenities
                         </Button>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         {amenities.map((amenity, index) => (
                           <div key={index} className="text-[#808080] text-sm">
                             {amenity}
@@ -208,7 +268,7 @@ export default function HotelInfoSheet({
                     <h4 className="text-lg font-medium text-[#4D4D4D]">
                       Hotel Features
                     </h4>
-                    <p className="text-sm text-[#666666]">
+                    <p className="text-xs md:text-sm text-[#666666]">
                       Offering an outdoor pool and barbecue, Lagos Oriental
                       Hotel is located in Lagos. The hotel has a terrace and
                       fitness center, and guests can enjoy a drink at the bar.
@@ -225,37 +285,10 @@ export default function HotelInfoSheet({
                   <HotelAmenities />
                 </TabsContent>
                 <TabsContent value="reviews">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Rating Section */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="text-2xl font-medium">4.0</span>
-                        <Star className="h-6 w-6 fill-[#FC5D01] text-[#FC5D01]" />
-                      </div>
-                      <p className="text-[#808080] mb-4">53 ratings</p>
+                  {/* Rating Section */}
 
-                      {/* Rating Breakdown */}
-                      <div className="space-y-2">
-                        {ratingData.map((rating) => (
-                          <div
-                            key={rating.stars}
-                            className="flex items-center gap-2"
-                          >
-                            <span className="text-sm w-2">{rating.stars}</span>
-                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-[#FC5D01] rounded-full"
-                                style={{ width: `${rating.percentage}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* reviews */}
-                    <HotelReviews />
-                  </div>
+                  {/* reviews */}
+                  <HotelReviews />
                 </TabsContent>
                 <TabsContent value="map">
                   <HotelMap name={hotelName} />
