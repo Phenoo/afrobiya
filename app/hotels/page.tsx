@@ -7,10 +7,11 @@ import { useState } from "react";
 import { Filter, X } from "lucide-react";
 
 export default function HotelsPage() {
-  
+
   const [showFilters, setShowFilters] = useState(false);
 
   return (
+
     <div className="min-h-screen bg-white">
       <div className="bg-[#F8F9FA] border-b py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -68,5 +69,6 @@ export default function HotelsPage() {
         </div>
       </div>
     </div>
+    
   );
 }
