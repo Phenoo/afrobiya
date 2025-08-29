@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import Image from "next/image";
 
 import {
@@ -77,7 +76,9 @@ export function PopularDestinations() {
                   className="text-center p-4 hover:shadow-lg rounded-2xl  transition-shadow"
                 >
                   <div className="w-32 h-44 mx-auto mb-4 rounded-full overflow-hidden">
-                    <img
+                    <Image
+                      width={128}
+                      height={176}
                       src={destination.image || "/placeholder.svg"}
                       alt={destination.name}
                       className="w-full h-full object-cover"

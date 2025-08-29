@@ -27,16 +27,25 @@ export default function Header() {
         </div>
 
         <nav className="hidden lg:flex items-center space-x-8">
-          <a href="/" className="text-[#808080] text-sm hover:text-[#333333]">
+          <Link
+            href="/"
+            className="text-[#808080] text-sm hover:text-[#333333]"
+          >
             Home
-          </a>
-          <a href="#" className="text-[#808080] text-sm  hover:text-[#333333]">
+          </Link>
+          <Link
+            href="#home"
+            className="text-[#808080] text-sm  hover:text-[#333333]"
+          >
             Flights
-          </a>
-          <a href="#" className="text-[#808080] text-sm  hover:text-[#333333]">
+          </Link>
+          <Link
+            href="#"
+            className="text-[#808080] text-sm  hover:text-[#333333]"
+          >
             Vehicles
-          </a>
-          <a
+          </Link>
+          <Link
             href="/hotels"
             className={cn(
               "text-[#808080] text-sm",
@@ -45,13 +54,19 @@ export default function Header() {
             )}
           >
             Hotels
-          </a>
-          <a href="#" className="text-[#808080] text-sm  hover:text-[#333333]">
+          </Link>
+          <Link
+            href="#"
+            className="text-[#808080] text-sm  hover:text-[#333333]"
+          >
             Travel Tips
-          </a>
-          <a href="#" className="text-[#808080] text-sm  hover:text-[#333333]">
+          </Link>
+          <Link
+            href="#"
+            className="text-[#808080] text-sm  hover:text-[#333333]"
+          >
             Contact
-          </a>
+          </Link>
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
@@ -96,16 +111,25 @@ export default function Header() {
         <div className="lg:hidden">
           <div className="px-4 pt-4 pb-6 space-y-4 bg-white border-t border-gray-200">
             <nav className="flex flex-col space-y-4">
-              <a href="/" className="text-[#808080] hover:text-[#333333] py-2">
+              <Link
+                href="/"
+                className="text-[#808080] hover:text-[#333333] py-2"
+              >
                 Home
-              </a>
-              <a href="#" className="text-[#808080] hover:text-[#333333] py-2">
+              </Link>
+              <Link
+                href="#"
+                className="text-[#808080] hover:text-[#333333] py-2"
+              >
                 Flights
-              </a>
-              <a href="#" className="text-[#808080] hover:text-[#333333] py-2">
+              </Link>
+              <Link
+                href="#"
+                className="text-[#808080] hover:text-[#333333] py-2"
+              >
                 Vehicles
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/hotels"
                 className={cn(
                   "text-[#808080] py-2",
@@ -114,13 +138,19 @@ export default function Header() {
                 )}
               >
                 Hotels
-              </a>
-              <a href="#" className="text-[#808080] hover:text-[#333333] py-2">
+              </Link>
+              <Link
+                href="#"
+                className="text-[#808080] hover:text-[#333333] py-2"
+              >
                 Travel Tips
-              </a>
-              <a href="#" className="text-[#808080] hover:text-[#333333] py-2">
+              </Link>
+              <Link
+                href="#"
+                className="text-[#808080] hover:text-[#333333] py-2"
+              >
                 Contact
-              </a>
+              </Link>
             </nav>
 
             <div className="pt-4 border-t border-gray-200 space-y-4">
