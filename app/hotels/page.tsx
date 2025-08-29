@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Filter, X } from "lucide-react";
 
 export default function HotelsPage() {
+  
   const [showFilters, setShowFilters] = useState(false);
 
   return (
