@@ -46,9 +46,11 @@ export function FeaturedHotels() {
                   className="flex items-center gap-4 backdrop-blur-sm rounded-2xl"
                 >
                   <div className="relative">
-                    <img
+                    <Image
                       src={hotel.image || "/placeholder.svg"}
                       alt={hotel.name}
+                      width={128}
+                      height={128}
                       className="w-32 h-32 rounded-3xl object-cover"
                     />
                     <Button
@@ -87,9 +89,10 @@ export function FeaturedHotels() {
             {/* Right side - Featured hotel */}
             <div className="absolute right-16 h-[400px] w-[600px]">
               <div className="relative rounded-2xl h-full overflow-hidden w-full">
-                <img
+                <Image
                   src="/venetian-palazzo-featured.png"
                   alt="The Venetian and The Palazzo"
+                  fill
                   className=" h-full w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/30" />
