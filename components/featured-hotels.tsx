@@ -39,7 +39,7 @@ export function FeaturedHotels() {
         <div className="w-full">
           <div className="flex flex-row  items-center relative">
             {/* Left side - Small hotel cards */}
-            <div className="space-y-4 bg-[#D7DAFF] py-12  w-2/3 rounded-3xl p-8">
+            <div className="space-y-4 bg-[#D7DAFF] py-12  md:w-2/3 rounded-3xl p-8">
               {smallHotels.map((hotel, index) => (
                 <div
                   key={index}
@@ -61,7 +61,7 @@ export function FeaturedHotels() {
                     </Button>
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-[#333333] mb-1 text-2xl">
+                    <h3 className="font-semibold text-[#333333] mb-1 text-lg md:text-2xl">
                       {hotel.name}
                     </h3>
                     <div className="flex items-center gap-1 text-sm text-[#808080] mb-2">
@@ -87,7 +87,7 @@ export function FeaturedHotels() {
             </div>
 
             {/* Right side - Featured hotel */}
-            <div className="absolute right-16 h-[400px] w-[600px]">
+            <div className="hidden md:flex absolute right-16 h-[400px] w-[600px]">
               <div className="relative rounded-2xl h-full overflow-hidden w-full">
                 <Image
                   src="/venetian-palazzo-featured.png"

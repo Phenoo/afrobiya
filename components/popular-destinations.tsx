@@ -57,13 +57,13 @@ const destinations = [
 
 export function PopularDestinations() {
   return (
-    <section className="pb-16 pt-[700px] lg:pt-48 bg-[#F8F9FA]  px-6">
-      <div className="max-w-7xl mx-auto">
+    <section className="pb-16 pt-[700px] lg:pt-48 bg-[#F8F9FA] w-full  px-6">
+      <div className="max-w-7xl w-full relative mx-auto">
         <Carousel
           opts={{
             align: "start",
           }}
-          className="w-full "
+          className="w-full overflow-hidden"
         >
           <CarouselContent>
             {destinations.map((destination, index) => (

@@ -121,6 +121,9 @@
   }
 }
 
+html {
+  overflow-x: hidden;
+}
 
 /* Chrome / Safari / Edge */
 *::-webkit-scrollbar {

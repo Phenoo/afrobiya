@@ -15,13 +15,19 @@ import { format } from "date-fns";
 import Image from "next/image";
 import CurrencyNationalitySelector from "./CurrencyNationalitySelector";
 
+type Room = {
+  adults: number;
+  children: number;
+};
+
 export default function BookingForm() {
   const [activeTab, setActiveTab] = useState("hotels");
-  const [rooms, setRooms] = useState(1);
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [checkInDate, setCheckInDate] = useState<Date>(new Date());
   const [checkOutDate, setCheckOutDate] = useState<Date>();
+
+  const [rooms, setRooms] = useState<Room[]>([{ adults: 1, children: 0 }]);
 
   const [selectedRoomBasis, setSelectedRoomBasis] = useState<string[]>([]);
   const [selectedStarLevels, setSelectedStarLevels] = useState<number[]>([]);
@@ -69,6 +75,28 @@ export default function BookingForm() {
     } else {
       setSelectedStarLevels(selectedStarLevels.filter((l) => l !== level));
     }
+  };
+
+  const addRoom = () => {
+    if (rooms.length < 3) {
+      setRooms([...rooms, { adults: 1, children: 0 }]);
+    }
+  };
+
+  const removeRoom = (index: number) => {
+    if (rooms.length > 1) {
+      setRooms(rooms.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateRoom = (
+    index: number,
+    type: "adults" | "children",
+    value: number
+  ) => {
+    const updatedRooms = [...rooms];
+    updatedRooms[index][type] = Math.max(type === "adults" ? 1 : 0, value);
+    setRooms(updatedRooms);
   };
 
   return (
@@ -313,90 +341,96 @@ export default function BookingForm() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1  gap-4 mb-4">
-              {/* Rooms */}
-              <div>
-                <div className="text-[#666666] mb-1 text-sm text-left">
-                  Room (s)
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
-                    onClick={() => setRooms(Math.max(1, rooms - 1))}
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <div className="bg-white px-2 py-2 h-8 items-center flex justify-center rounded w-[40px] text-center">
-                    {rooms}
+            <div className="space-y-4 mb-4">
+              {rooms.map((room, index) => (
+                <div key={index} className="border p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="text-sm font-medium text-gray-700">
+                      Room {index + 1}
+                    </h4>
+                    {rooms.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeRoom(index)}
+                        className="text-red-500"
+                      >
+                        Remove
+                      </Button>
+                    )}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
-                    onClick={() => setRooms(rooms + 1)}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
+                  <div>
+                    <div className="text-[#666666] mb-1 text-sm text-left">
+                      Adult (s)
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
+                        onClick={() =>
+                          updateRoom(index, "adults", room.adults - 1)
+                        }
+                      >
+                        <Minus className="w-4 h-4" />
+                      </Button>
+                      <div className="bg-white px-2 py-2 h-8 items-center flex justify-center rounded w-[40px] text-center">
+                        {adults}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
+                        onClick={() =>
+                          updateRoom(index, "adults", room.adults + 1)
+                        }
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
 
-              {/* Adults */}
-              <div>
-                <div className="text-[#666666] mb-1 text-sm text-left">
-                  Adult (s)
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
-                    onClick={() => setAdults(Math.max(1, adults - 1))}
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <div className="bg-white px-2 py-2 h-8 items-center flex justify-center rounded w-[40px] text-center">
-                    {adults}
+                  {/* Children */}
+                  <div>
+                    <div className="text-[#666666] mb-1 text-sm text-left">
+                      Children
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
+                        onClick={() =>
+                          updateRoom(index, "adults", room.children - 1)
+                        }
+                      >
+                        <Minus className="w-4 h-4" />
+                      </Button>
+                      <div className="bg-white px-2 py-2 h-8 items-center flex justify-center rounded w-[40px] text-center">
+                        {adults}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
+                        onClick={() =>
+                          updateRoom(index, "adults", room.children + 1)
+                        }
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
-                    onClick={() => setAdults(adults + 1)}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
                 </div>
-              </div>
+              ))}
 
-              {/* Children */}
-              <div>
-                <div className="text-[#666666] mb-1 text-sm text-left">
-                  Children
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
-                    onClick={() => setChildren(Math.max(0, children - 1))}
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <div className="bg-white px-2 py-2 h-8 items-center flex justify-center rounded w-[40px] text-center">
-                    {children}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 p-0 rounded-lg bg-[#E6E6E6]"
-                    onClick={() => setChildren(children + 1)}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
+              <Button
+                className="w-full mt-2 "
+                onClick={addRoom}
+                disabled={rooms.length >= 3}
+              >
+                + Add Room
+              </Button>
             </div>
 
             {/* Currency and Nationality Selection */}
@@ -413,4 +447,69 @@ export default function BookingForm() {
       </div>
     </div>
   );
+}
+
+{
+  /* Adults */
+}
+{
+  /* <div>
+  <div className="text-[#666666] mb-1 text-sm text-left">
+    Adult (s)
+  </div>
+  <div className="flex items-center gap-2">
+    <Button
+      variant="outline"
+      size="sm"
+      className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
+      onClick={() => setAdults(Math.max(1, adults - 1))}
+    >
+      <Minus className="w-4 h-4" />
+    </Button>
+    <div className="bg-white px-2 py-2 h-8 items-center flex justify-center rounded w-[40px] text-center">
+      {adults}
+    </div>
+    <Button
+      variant="outline"
+      size="sm"
+      className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
+      onClick={() => setAdults(adults + 1)}
+    >
+      <Plus className="w-4 h-4" />
+    </Button>
+  </div>
+</div> */
+}
+
+{
+  /* Children */
+}
+{
+  /* <div>
+  <div className="text-[#666666] mb-1 text-sm text-left">
+    Children
+  </div>
+  <div className="flex items-center gap-2">
+    <Button
+      variant="outline"
+      size="sm"
+      className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
+      onClick={() => setChildren(Math.max(0, children - 1))}
+    >
+      <Minus className="w-4 h-4" />
+    </Button>
+    <div className="bg-white px-2 py-2 h-8 items-center flex justify-center rounded w-[40px] text-center">
+      {children}
+    </div>
+    <Button
+      variant="outline"
+      size="sm"
+      className="flex-1 h-8 p-0 rounded-lg bg-[#E6E6E6]"
+      onClick={() => setChildren(children + 1)}
+    >
+      <Plus className="w-4 h-4" />
+    </Button>
+  </div>
+</div>
+</div> */
 }
