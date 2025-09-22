@@ -22,8 +22,9 @@ type Room = {
 
 export default function BookingForm() {
   const [activeTab, setActiveTab] = useState("hotels");
-  const [adults, setAdults] = useState(1);
-  const [children, setChildren] = useState(0);
+  const [value, setValue] = useState("");
+  const [error, setError] = useState("");
+
   const [checkInDate, setCheckInDate] = useState<Date>(new Date());
   const [checkOutDate, setCheckOutDate] = useState<Date>();
 
@@ -97,6 +98,16 @@ export default function BookingForm() {
     const updatedRooms = [...rooms];
     updatedRooms[index][type] = Math.max(type === "adults" ? 1 : 0, value);
     setRooms(updatedRooms);
+  };
+
+  const handleSubmit = () => {
+    if (value.trim() === "") {
+      setError("Search is empty — sending anyway...");
+    } else {
+      setError("");
+    }
+
+    console.log("Sending:", value);
   };
 
   return (
@@ -278,6 +289,8 @@ export default function BookingForm() {
             <div className="relative mb-6">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
                 placeholder="Search hotel name, city, or airport"
                 className="pl-12 pr-12 py-4 sm:py-6 text-base border-gray-300 rounded-3xl"
               />
@@ -285,6 +298,7 @@ export default function BookingForm() {
                 ⌘J
               </div>
             </div>
+            {error && <p className="text-sm text-gray-500 mt-1">{error}</p>}
 
             {/* Date Selection */}
             <div className="flex flex-col sm:flex-row gap-2 mb-4">
@@ -375,7 +389,7 @@ export default function BookingForm() {
                         <Minus className="w-4 h-4" />
                       </Button>
                       <div className="bg-white px-2 py-2 h-8 items-center flex justify-center rounded w-[40px] text-center">
-                        {adults}
+                        {room.adults}
                       </div>
                       <Button
                         variant="outline"
@@ -401,20 +415,20 @@ export default function BookingForm() {
                         size="sm"
                         className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
                         onClick={() =>
-                          updateRoom(index, "adults", room.children - 1)
+                          updateRoom(index, "children", room.children - 1)
                         }
                       >
                         <Minus className="w-4 h-4" />
                       </Button>
                       <div className="bg-white px-2 py-2 h-8 items-center flex justify-center rounded w-[40px] text-center">
-                        {adults}
+                        {room.children}
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
                         className="flex-1 h-8 p-0 rounded bg-[#E6E6E6]"
                         onClick={() =>
-                          updateRoom(index, "adults", room.children + 1)
+                          updateRoom(index, "children", room.children + 1)
                         }
                       >
                         <Plus className="w-4 h-4" />
@@ -439,7 +453,10 @@ export default function BookingForm() {
             </div>
 
             {/* Search Button */}
-            <Button className="w-full py-4 text-xs bg-[#0000FF] hover:bg-blue-700 rounded-lg">
+            <Button
+              className="w-full py-4 text-xs bg-[#0000FF] hover:bg-blue-700 rounded-lg"
+              onClick={handleSubmit}
+            >
               Search
             </Button>
           </div>
