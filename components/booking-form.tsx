@@ -11,6 +11,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { format } from "date-fns";
 import Image from "next/image";
 import CurrencyNationalitySelector from "./CurrencyNationalitySelector";
@@ -18,6 +29,7 @@ import CurrencyNationalitySelector from "./CurrencyNationalitySelector";
 type Room = {
   adults: number;
   children: number;
+  childrenAges: number[];
 };
 
 export default function BookingForm() {
@@ -28,7 +40,9 @@ export default function BookingForm() {
   const [checkInDate, setCheckInDate] = useState<Date>(new Date());
   const [checkOutDate, setCheckOutDate] = useState<Date>();
 
-  const [rooms, setRooms] = useState<Room[]>([{ adults: 1, children: 0 }]);
+  const [rooms, setRooms] = useState([
+    { adults: 2, children: 0, childrenAges: [] },
+  ]);
 
   const [selectedRoomBasis, setSelectedRoomBasis] = useState<string[]>([]);
   const [selectedStarLevels, setSelectedStarLevels] = useState<number[]>([]);
@@ -80,7 +94,7 @@ export default function BookingForm() {
 
   const addRoom = () => {
     if (rooms.length < 3) {
-      setRooms([...rooms, { adults: 1, children: 0 }]);
+      setRooms([...rooms, { adults: 1, children: 0, childrenAges: [] }]);
     }
   };
 
@@ -92,12 +106,36 @@ export default function BookingForm() {
 
   const updateRoom = (
     index: number,
-    type: "adults" | "children",
-    value: number
+    type: "adults" | "children" | "childrenAges",
+    value: any
   ) => {
-    const updatedRooms = [...rooms];
-    updatedRooms[index][type] = Math.max(type === "adults" ? 1 : 0, value);
-    setRooms(updatedRooms);
+    setRooms((prev) => {
+      const updatedRooms = [...prev];
+      const room = { ...updatedRooms[index] };
+
+      if (type === "adults") {
+        room.adults = Math.max(1, value);
+      } else if (type === "children") {
+        const newChildren = Math.max(0, value);
+        room.children = newChildren;
+
+        // Adjust childrenAges length
+        if (newChildren > room.childrenAges.length) {
+          //@ts-ignore
+          room.childrenAges = [
+            ...room.childrenAges,
+            ...Array(newChildren - room.childrenAges.length).fill(null),
+          ];
+        } else {
+          room.childrenAges = room.childrenAges.slice(0, newChildren);
+        }
+      } else if (type === "childrenAges") {
+        room.childrenAges = value;
+      }
+
+      updatedRooms[index] = room;
+      return updatedRooms;
+    });
   };
 
   const handleSubmit = () => {
@@ -435,6 +473,44 @@ export default function BookingForm() {
                       </Button>
                     </div>
                   </div>
+                  {room.children > 0 && (
+                    <div className="mt-2 space-y-2">
+                      {room.childrenAges.map((age, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <span className="text-sm text-[#666666]">
+                            Child {i + 1} age:
+                          </span>
+                          <Select
+                            value={
+                              age !== null && age !== undefined
+                                ? String(age)
+                                : ""
+                            }
+                            onValueChange={(val) => {
+                              const newAges = [...room.childrenAges];
+                              //@ts-ignore
+                              newAges[i] = Number(val); // convert back to number
+                              updateRoom(index, "childrenAges", newAges);
+                            }}
+                          >
+                            <SelectTrigger className="w-[180px] text-black">
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectLabel>Age</SelectLabel>
+                                {Array.from({ length: 18 }, (_, n) => (
+                                  <SelectItem key={n} value={String(n)}>
+                                    {n}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
 
