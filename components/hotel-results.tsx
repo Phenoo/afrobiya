@@ -111,7 +111,7 @@ const HotelResults = ({ loading, results }: { loading?: boolean; results: any })
       description: string;
       facilities: string[];
       category: number;
-      images: string[] | { url: string; description: string; }[];
+      images: { url: string; description: string; }[];
       city_code: number;
       coordinates: { longitude: number; latitude: number };
       hotel_id: number;
