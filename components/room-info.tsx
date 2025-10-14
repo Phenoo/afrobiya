@@ -1,25 +1,27 @@
 "use client";
 
-import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, MapPin, Heart, Star } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
+import { getFacilityIcon, FacilityIcon } from './facilities-icons';
 
 interface RoomInfoSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  roomName: string;
   roomData?: {
-    name: string;
-    image: string;
-    size: string;
-    floor: string;
-    bedType: string;
-    cribAvailable: boolean;
-    price: number;
+    Category: string;
+    Currency: string;
+    HotelSearchCode: string;
+    Remark: string;
+    Rooms: string[];
+    Special: string;
+    TotalPrice: number;
+    RoomBasis: string;
   };
+  roomFeatures: any[];
 }
 
 const roomFeatures = [
@@ -87,11 +89,11 @@ const roomFeatures = [
 export default function RoomInfoSheet({
   isOpen,
   onClose,
-  roomName,
   roomData,
+  roomFeatures,
 }: RoomInfoSheetProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+console.log("Room Data in RoomInfoSheet:", roomFeatures);
   const images = [
     "/lagos-continental.png",
     "/fairmont-resort-dubai.png",
@@ -118,6 +120,48 @@ export default function RoomInfoSheet({
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  const StarRating = ({ rating }: { rating: number }) => {
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`h-4 w-4 ${
+            star <= rating ? "fill-[#FC5D01] text-[#FC5D01]" : "text-gray-300"
+          }`}
+        />
+      ))}
+    </div>
+  );
+};
+
+function FacilityList({ 
+      facilities, 
+      maxFacilities 
+    }: { 
+      facilities: string[]; 
+      maxFacilities?: number;
+    }) {
+      // Determine which facilities to display
+      const facilitiesToDisplay = maxFacilities 
+        ? facilities.slice(0, maxFacilities)
+        : facilities;
+  
+      return (
+        <div className="flex flex-col items-start gap-1 text-sm text-[#808080]">
+          {facilitiesToDisplay.map((facility, index) => {
+            const IconComponent = getFacilityIcon(facility);
+            return (
+              <div key={index} className="flex items-center gap-1">
+                <IconComponent className="h-4 w-4" />
+                <span>{facility}</span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent
@@ -127,11 +171,13 @@ export default function RoomInfoSheet({
         <div className="bg-white w-full h-full">
           {/* Header */}
           <SheetHeader className="flex flex-row items-center justify-between mb-4 px-6 py-4 border-b">
-            <h2 className="text-sm">Room Info • {room.name}</h2>
+            <SheetTitle className="text-left tracking-widest text-sm text-[#808080] font-normal">
+              Room Info • {roomData?.Rooms[0]}
+            </SheetTitle>
           </SheetHeader>
 
           {/* Image Section */}
-          <div className="w-full relative h-64 px-8 py-4 flex justify-between items-center">
+          {/*<div className="w-full relative h-64 px-8 py-4 flex justify-between items-center">
             <Button
               variant="ghost"
               size="sm"
@@ -150,7 +196,7 @@ export default function RoomInfoSheet({
               />
             </div>
 
-            {/* Navigation Arrows */}
+           
 
             <Button
               variant="ghost"
@@ -160,21 +206,16 @@ export default function RoomInfoSheet({
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
-          </div>
+          </div>*/}
 
           {/* Room Details */}
-          <div className="py-6 space-y-2">
+          <div className="space-y-2">
             <div className="flex items-start flex-col gap-6 md:flex-row px-6 justify-between">
               <div className="space-y-2">
-                <h1 className="text-xl font-medium">{room.name}</h1>
+                <h1 className="text-xl font-medium">{roomData?.Rooms[0]}</h1>
                 <div className="flex items-center text-sm gap-2 text-gray-600">
-                  <span>{room.size}</span>
+                  <span>{roomData?.RoomBasis}</span>
                   <span>•</span>
-                  <span>{room.floor}</span>
-                  <span>•</span>
-                  <span>{room.bedType}</span>
-                  <span>•</span>
-                  <span>Free crib available on request</span>
                 </div>
               </div>
 
@@ -185,8 +226,8 @@ export default function RoomInfoSheet({
                   </Button>
                 </Link>
                 <div className="text-right">
-                  <div className="text-4xl font-bold text-[#0010DC]">
-                    ${room.price}
+                  <div className="text-1xl font-bold text-[#0010DC]">
+                    {roomData?.Currency}{roomData?.TotalPrice.toFixed(2)}
                   </div>
                   <div className="text-sm text-gray-600 mb-3">per night</div>
                 </div>
@@ -196,19 +237,45 @@ export default function RoomInfoSheet({
             {/* Room Features and Facilities */}
             <div className="space-y-4 px-6">
               <h2 className="text-lg font-medium text-[#4D4D4D]">
-                Room Features and Facilities
+                Room Facilities
               </h2>
 
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
-                {roomFeatures.map((category) => (
-                  <div key={category.category} className="space-y-2">
-                    {category.items.map((item, index) => (
-                      <div key={index} className="text-xs text-[#666666]">
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                ))}
+                {roomFeatures.length > 0 && (
+                  <FacilityList facilities={roomFeatures} />
+                )}
+              </div>
+            </div>
+            <div className="space-y-4 px-6">
+              <h2 className="text-lg font-medium text-[#4D4D4D]">
+                Rating
+              </h2>
+
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">
+                    {Number(roomData?.Category).toFixed(1)}
+                  </span>
+                  <StarRating rating={Number(roomData?.Category) || 0} />
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4 px-6">
+              <h2 className="text-lg font-medium text-[#4D4D4D]">
+                Remarks
+              </h2>
+
+              <div className="grid gap-y-4">
+                <span dangerouslySetInnerHTML={{ __html: roomData?.Remark ?? "" }} />
+              </div>
+            </div>
+            <div className="space-y-4 px-6">
+              <h2 className="text-lg font-medium text-[#4D4D4D]">
+                Comment
+              </h2>
+
+              <div className="grid gap-y-4">
+                <span dangerouslySetInnerHTML={{ __html: roomData?.Special ?? "" }} />
               </div>
             </div>
           </div>

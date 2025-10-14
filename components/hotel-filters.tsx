@@ -1,103 +1,147 @@
-import { Input } from "@/components/ui/input";
-import { Search, ChevronDown, Star } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import Image from "next/image";
-import { useState } from "react";
 import { Checkbox } from "./ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Star } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 
-export default function HotelFilters() {
-  const [budgetRange, setBudgetRange] = useState([5000, 1000000]);
-  const [selectedBeds, setSelectedBeds] = useState<string[]>([]);
-  const [selectedRoomBasis, setSelectedRoomBasis] = useState<string[]>([]);
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [selectedStarLevels, setSelectedStarLevels] = useState<number[]>([]);
-  const [selectedGuestRatings, setSelectedGuestRatings] = useState<number[]>(
-    []
+interface HotelFiltersProps {
+  onFiltersApply?: () => void; // Optional callback for parent component
+}
+
+export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Initialize state from URL params or defaults
+  const [budgetRange, setBudgetRange] = useState<[number, number]>([
+    Number(searchParams.get('minPrice')) || 50,
+    Number(searchParams.get('maxPrice')) || 1000000
+  ]);
+  
+  const [selectedRoomBasis, setSelectedRoomBasis] = useState<string[]>(
+    searchParams.get('roomBasis')?.split(',') || []
+  );
+  
+  const [selectedStarLevels, setSelectedStarLevels] = useState<number[]>(
+    searchParams.get('starLevels')?.split(',').map(Number) || []
   );
 
   const roomBasisOptions = [
-    "Any",
-    "Room Only",
-    "Bed and Breakfast",
-    "Half Board",
-    "Full Board",
-    "All Inclusive",
+    { code: "RO", description: "ROOM ONLY" },
+    { code: "BB", description: "BED AND BREAKFAST" },
+    { code: "BB2", description: "BED AND BREAKFAST UP TO 2" },
+    { code: "HB", description: "HALF-BOARD" },
+    { code: "FB", description: "FULL-BOARD" },
+    { code: "CB", description: "CONTINENTAL BREAKFAST" },
+    { code: "AIS", description: "ALL INCLUSIVE SOFT" },
+    { code: "AI", description: "ALL INCLUSIVE" },
   ];
-  const starLevels = [1, 2, 3, 4, 5];
 
-  const clearBudgetFilter = () => {
-    setBudgetRange([5000, 1000000]);
+  const starLevels = [
+    { id: 1, label: 1, count: 6 },
+    { id: 2, label: 2, count: 0 },
+    { id: 3, label: 3, count: 35 },
+    { id: 4, label: 4, count: 49 },
+    { id: 5, label: 5, count: 135 }
+  ];
+
+  const handleBudgetChange = (value: number[]) => {
+    setBudgetRange(value as [number, number]);
   };
 
-  const clearBedsFilter = () => {
-    setSelectedBeds([]);
+  const clearBudgetFilter = () => {
+    setBudgetRange([50, 1000000]);
+  };
+
+  const handleRoomBasisChange = (option: string, checked: boolean) => {
+    const newRoomBasis = checked
+      ? [...selectedRoomBasis, option]
+      : selectedRoomBasis.filter((o) => o !== option);
+    
+    setSelectedRoomBasis(newRoomBasis);
   };
 
   const clearRoomBasisFilter = () => {
     setSelectedRoomBasis([]);
   };
 
-  const clearAmenitiesFilter = () => {
-    setSelectedAmenities([]);
+  const handleStarLevelChange = (level: number, checked: boolean) => {
+    const newStarLevels = checked
+      ? [...selectedStarLevels, level]
+      : selectedStarLevels.filter((l) => l !== level);
+    
+    setSelectedStarLevels(newStarLevels);
   };
 
   const clearStarLevelFilter = () => {
     setSelectedStarLevels([]);
   };
 
-  const clearGuestRatingFilter = () => {
-    setSelectedGuestRatings([]);
+  const handleApplyFilters = () => {
+    // Create new URLSearchParams with existing search params
+    const newParams = new URLSearchParams(searchParams.toString());
+    
+    // Update roomBasis parameter (comma-separated)
+    if (selectedRoomBasis.length > 0) {
+      newParams.set('roomBasis', selectedRoomBasis.join(','));
+    } else {
+      newParams.delete('roomBasis');
+    }
+    
+    // Update starLevels parameter (comma-separated)
+    if (selectedStarLevels.length > 0) {
+      newParams.set('starLevels', selectedStarLevels.join(','));
+    } else {
+      newParams.delete('starLevels');
+    }
+    
+    // Update price range parameters
+    newParams.set('minPrice', budgetRange[0].toString());
+    newParams.set('maxPrice', budgetRange[1].toString());
+    
+    // Update URL without page reload
+    router.push(`?${newParams.toString()}`, { scroll: false });
+    
+    // Call parent callback if provided
+    if (onFiltersApply) {
+      onFiltersApply();
+    }
+    
+    console.log('Applied filters:', {
+      roomBasis: selectedRoomBasis,
+      starLevels: selectedStarLevels,
+      minPrice: budgetRange[0],
+      maxPrice: budgetRange[1]
+    });
   };
 
-  const handleBedsChange = (bed: string, checked: boolean) => {
-    if (checked) {
-      setSelectedBeds([...selectedBeds, bed]);
-    } else {
-      setSelectedBeds(selectedBeds.filter((b) => b !== bed));
+  const handleClearAllFilters = () => {
+    // Clear all local state
+    setBudgetRange([50, 1000000]);
+    setSelectedRoomBasis([]);
+    setSelectedStarLevels([]);
+    
+    // Create new URLSearchParams without filter parameters
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.delete('roomBasis');
+    newParams.delete('starLevels');
+    newParams.delete('minPrice');
+    newParams.delete('maxPrice');
+    
+    // Update URL
+    router.push(`?${newParams.toString()}`, { scroll: false });
+    
+    // Call parent callback if provided
+    if (onFiltersApply) {
+      onFiltersApply();
     }
   };
 
-  const handleRoomBasisChange = (option: string, checked: boolean) => {
-    if (checked) {
-      setSelectedRoomBasis([...selectedRoomBasis, option]);
-    } else {
-      setSelectedRoomBasis(selectedRoomBasis.filter((o) => o !== option));
-    }
-  };
-
-  const handleAmenityChange = (amenity: string, checked: boolean) => {
-    if (checked) {
-      setSelectedAmenities([...selectedAmenities, amenity]);
-    } else {
-      setSelectedAmenities(selectedAmenities.filter((a) => a !== amenity));
-    }
-  };
-
-  const handleStarLevelChange = (level: number, checked: boolean) => {
-    if (checked) {
-      setSelectedStarLevels([...selectedStarLevels, level]);
-    } else {
-      setSelectedStarLevels(selectedStarLevels.filter((l) => l !== level));
-    }
-  };
-
-  const handleGuestRatingChange = (rating: number, checked: boolean) => {
-    if (checked) {
-      setSelectedGuestRatings([...selectedGuestRatings, rating]);
-    } else {
-      setSelectedGuestRatings(selectedGuestRatings.filter((r) => r !== rating));
-    }
-  };
   return (
     <div className="space-y-4 lg:space-y-6">
-      {/* Search Hotels */}
-      <div>
-        <div className="relative">
-          <Input placeholder="Search hotel" className="pl-8 rounded-3xl py-4" />
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-        </div>
-      </div>
-
       {/* Budget Filter */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
@@ -119,9 +163,9 @@ export default function HotelFilters() {
         <div className="px-3">
           <Slider
             value={budgetRange}
-            onValueChange={setBudgetRange}
+            onValueChange={handleBudgetChange}
             max={1000000}
-            min={5000}
+            min={50}
             step={1000}
             className="w-full"
           />
@@ -132,53 +176,10 @@ export default function HotelFilters() {
         </div>
       </div>
 
-      {/* Number of Beds */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
-          <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest">
-            NUMBER OF BEDS
-          </h3>
-          <div
-            className="flex items-center justify-center cursor-pointer"
-            onClick={clearBedsFilter}
-          >
-            <Image
-              src={"/Fundamental Button.svg"}
-              alt="logo"
-              width={25}
-              height={25}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
-          {[
-            { name: "1 Bed", count: 478 },
-            { name: "2 Beds", count: 195 },
-            { name: "3+ Beds", count: 201 },
-          ].map((bed) => (
-            <div key={bed.name} className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id={bed.name}
-                  checked={selectedBeds.includes(bed.name)}
-                  onCheckedChange={(checked) =>
-                    handleBedsChange(bed.name, checked as boolean)
-                  }
-                />
-                <label htmlFor={bed.name} className="text-sm text-[#666666]">
-                  {bed.name}
-                </label>
-              </div>
-              <span className="text-sm text-gray-500">({bed.count})</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Room Basis */}
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
-          <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest ">
+          <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest">
             ROOM BASIS
           </h3>
           <div
@@ -196,80 +197,17 @@ export default function HotelFilters() {
 
         <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
           {roomBasisOptions.map((option) => (
-            <div key={option} className="flex items-center space-x-3">
+            <div key={option.code} className="flex items-center space-x-3">
               <Checkbox
-                id={option}
-                checked={selectedRoomBasis.includes(option)}
+                id={option.code}
+                checked={selectedRoomBasis.includes(option.code)}
                 onCheckedChange={(checked) =>
-                  handleRoomBasisChange(option, checked as boolean)
+                  handleRoomBasisChange(option.code, checked as boolean)
                 }
               />
-              <label htmlFor={option} className="text-sm text-[#666666]">
-                {option}
+              <label htmlFor={option.code} className="text-sm text-[#666666]">
+                {option.description}
               </label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Amenities */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
-          <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest">
-            AMENITIES
-          </h3>
-          <div
-            className="flex items-center justify-center cursor-pointer"
-            onClick={clearAmenitiesFilter}
-          >
-            <Image
-              src={"/Fundamental Button.svg"}
-              alt="logo"
-              width={25}
-              height={25}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
-          {[
-            { name: "Free Internet Access", count: 644 },
-            { name: "Free Breakfast", count: 46 },
-            { name: "Free Parking", count: 636 },
-            { name: "Pets Allowed", count: 19 },
-            { name: "Swimming Pool", count: 121 },
-            { name: "Airport Shuttle", count: 233 },
-            { name: "Spa", count: 103 },
-            { name: "Restaurant", count: 0 },
-            { name: "Casino", count: 8 },
-            { name: "No Smoking Rooms/Facilities", count: 620 },
-            { name: "Accessible Rooms/Facilities", count: 181 },
-            { name: "Fitness Center", count: 218 },
-            { name: "Business Center", count: 64 },
-            { name: "All Inclusive", count: 0 },
-            { name: "Waterfront", count: 37 },
-            { name: "Adults Only", count: 47 },
-            { name: "Hot Tub/Whirlpool", count: 84 },
-          ].map((amenity) => (
-            <div
-              key={amenity.name}
-              className="flex items-center justify-between"
-            >
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id={amenity.name}
-                  checked={selectedAmenities.includes(amenity.name)}
-                  onCheckedChange={(checked) =>
-                    handleAmenityChange(amenity.name, checked as boolean)
-                  }
-                />
-                <label
-                  htmlFor={amenity.name}
-                  className="text-sm text-[#666666]"
-                >
-                  {amenity.name}
-                </label>
-              </div>
-              <span className="text-sm text-gray-500">({amenity.count})</span>
             </div>
           ))}
         </div>
@@ -295,26 +233,26 @@ export default function HotelFilters() {
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
           {starLevels.map((level) => (
-            <div key={level} className="flex items-center space-x-3">
+            <div key={level.id} className="flex items-center space-x-3">
               <Checkbox
-                id={`star-${level}`}
-                checked={selectedStarLevels.includes(level)}
+                id={`star-${level.id}`}
+                checked={selectedStarLevels.includes(level.id)}
                 onCheckedChange={(checked) =>
-                  handleStarLevelChange(level, checked as boolean)
+                  handleStarLevelChange(level.id, checked as boolean)
                 }
               />
               <label
-                htmlFor={`star-${level}`}
+                htmlFor={`star-${level.id}`}
                 className="flex items-center gap-1"
               >
-                {Array.from({ length: level }, (_, i) => (
+                {Array.from({ length: level.label }, (_, i) => (
                   <Star
                     key={i}
                     className="w-4 h-4 fill-[#FC5D01] text-[#FC5D01]"
                   />
                 ))}
-                {Array.from({ length: 5 - level }, (_, i) => (
-                  <Star key={i + level} className="w-4 h-4 text-[#FC5D01]" />
+                {Array.from({ length: 5 - level.label }, (_, i) => (
+                  <Star key={i + level.label} className="w-4 h-4 text-[#FC5D01]" />
                 ))}
               </label>
             </div>
@@ -322,316 +260,22 @@ export default function HotelFilters() {
         </div>
       </div>
 
-      {/* Guest Rating */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
-          <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest">
-            GUEST RATING
-          </h3>
-          <div
-            className="flex items-center justify-center cursor-pointer"
-            onClick={clearGuestRatingFilter}
-          >
-            <Image
-              src={"/Fundamental Button.svg"}
-              alt="logo"
-              width={25}
-              height={25}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
-          {[
-            { stars: 1, count: 6 },
-            { stars: 2, count: 0 },
-            { stars: 3, count: 35 },
-            { stars: 4, count: 49 },
-            { stars: 5, count: 135 },
-          ].map((rating) => (
-            <div
-              key={rating.stars}
-              className="flex items-center justify-between"
-            >
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id={`rating-${rating.stars}`}
-                  checked={selectedGuestRatings.includes(rating.stars)}
-                  onCheckedChange={(checked) =>
-                    handleGuestRatingChange(rating.stars, checked as boolean)
-                  }
-                />
-                <label
-                  htmlFor={`rating-${rating.stars}`}
-                  className="flex items-center gap-1"
-                >
-                  {Array.from({ length: rating.stars }, (_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 fill-orange-500 text-orange-500"
-                    />
-                  ))}
-                  {Array.from({ length: 5 - rating.stars }, (_, i) => (
-                    <Star
-                      key={i + rating.stars}
-                      className="w-4 h-4 text-orange-500"
-                    />
-                  ))}
-                </label>
-              </div>
-              <span className="text-sm text-gray-500">({rating.count})</span>
-            </div>
-          ))}
-        </div>
+      {/* Action Buttons */}
+      <div className="space-y-3 pt-4">
+        <Button 
+          className="h-10 bg-blue-600 hover:bg-blue-700 w-full" 
+          onClick={handleApplyFilters}
+        >
+          Apply Filters
+        </Button>
+        <Button 
+          variant="outline" 
+          className="h-10 w-full" 
+          onClick={handleClearAllFilters}
+        >
+          Clear All Filters
+        </Button>
       </div>
     </div>
   );
 }
-// export default function HotelFilters() {
-//   return (
-//     <div className="space-y-6">
-//       {/* Search Hotels */}
-//       <div>
-//         <div className="relative">
-//           <Input placeholder="Search hotel" className="pl-8 rounded-3xl py-4" />
-//           <Search className="absolute left-2.5 top-2.5  h-4 w-4 text-gray-400" />
-//         </div>
-//       </div>
-
-//       {/* Budget Filter */}
-//       <div className="space-y-3">
-//         <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
-//           <h3 className="text-xs font-medium text-[#808080] uppercase  tracking-widest">
-//             BUDGET (PER NIGHT){" "}
-//           </h3>
-//           <div className="flex items-center justify-center">
-//             <Image
-//               src={"/Fundamental Button.svg"}
-//               alt="logo"
-//               width={25}
-//               height={25}
-//             />{" "}
-//           </div>
-//         </div>
-//         <div className="px-3">
-//           <Slider
-//             defaultValue={[5000, 1000000]}
-//             max={1000000}
-//             min={5000}
-//             step={1000}
-//             className="w-full"
-//           />
-//           <div className="flex justify-between text-sm text-[#808080] mt-2">
-//             <span>$5,000</span>
-//             <span>$1,000,000</span>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Number of Beds */}
-//       <div className="space-y-3">
-//         <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
-//           <h3 className="text-xs font-medium text-[#808080] uppercase  tracking-widest">
-//             NUMBER OF BEDS{" "}
-//           </h3>
-//           <div className="flex items-center justify-center">
-//             <Image
-//               src={"/Fundamental Button.svg"}
-//               alt="logo"
-//               width={25}
-//               height={25}
-//             />{" "}
-//           </div>
-//         </div>
-//         <div className="space-y-2">
-//           <label className="flex items-center justify-between">
-//             <div className="flex items-center gap-2">
-//               <input type="checkbox" className="rounded" />
-//               <span className="text-sm text-[#666666]">1 Bed</span>
-//             </div>
-//             <span className="text-sm text-[#666666]">(478)</span>
-//           </label>
-//           <label className="flex items-center justify-between">
-//             <div className="flex items-center gap-2">
-//               <input type="checkbox" className="rounded" />
-//               <span className="text-sm text-[#666666]">2 Beds</span>
-//             </div>
-//             <span className="text-sm text-[#666666]">(195)</span>
-//           </label>
-//           <label className="flex items-center justify-between">
-//             <div className="flex items-center gap-2">
-//               <input type="checkbox" className="rounded" />
-//               <span className="text-sm text-[#666666]">3+ Beds</span>
-//             </div>
-//             <span className="text-sm text-[#666666]">(201)</span>
-//           </label>
-//         </div>
-//       </div>
-
-//       {/* Room Basis */}
-//       <div className="space-y-3">
-//         <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
-//           <h3 className="text-xs font-medium text-[#808080] uppercase  tracking-widest">
-//             ROOM BASIS
-//           </h3>
-//           <div className="flex items-center justify-center">
-//             <Image
-//               src={"/Fundamental Button.svg"}
-//               alt="logo"
-//               width={25}
-//               height={25}
-//             />{" "}
-//           </div>
-//         </div>
-
-//         <div className="space-y-2">
-//           {[
-//             "Any",
-//             "Room Only",
-//             "Bed and Breakfast",
-//             "Half Board",
-//             "Full Board",
-//             "All Inclusive",
-//           ].map((option) => (
-//             <label key={option} className="flex items-center gap-2">
-//               <input type="checkbox" className="rounded" />
-//               <span className="text-sm text-[#666666]">{option}</span>
-//             </label>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Amenities */}
-//       <div className="space-y-3">
-//         <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
-//           <h3 className="text-xs font-medium text-[#808080] uppercase  tracking-widest">
-//             AMENTITIES
-//           </h3>
-//           <div className="flex items-center justify-center">
-//             <Image
-//               src={"/Fundamental Button.svg"}
-//               alt="logo"
-//               width={25}
-//               height={25}
-//             />{" "}
-//           </div>
-//         </div>
-//         <div className="space-y-2">
-//           {[
-//             { name: "Free Internet Access", count: 644 },
-//             { name: "Free Breakfast", count: 46 },
-//             { name: "Free Parking", count: 636 },
-//             { name: "Pets Allowed", count: 19 },
-//             { name: "Swimming Pool", count: 121 },
-//             { name: "Airport Shuttle", count: 233 },
-//             { name: "Spa", count: 103 },
-//             { name: "Restaurant", count: 0 },
-//             { name: "Casino", count: 8 },
-//             { name: "No Smoking Rooms/Facilities", count: 620 },
-//             { name: "Accessible Rooms/Facilities", count: 181 },
-//             { name: "Fitness Center", count: 218 },
-//             { name: "Business Center", count: 64 },
-//             { name: "All Inclusive", count: 0 },
-//             { name: "Waterfront", count: 37 },
-//             { name: "Adults Only", count: 47 },
-//             { name: "Hot Tub/Whirlpool", count: 84 },
-//           ].map((amenity) => (
-//             <label
-//               key={amenity.name}
-//               className="flex items-center justify-between"
-//             >
-//               <div className="flex items-center gap-2">
-//                 <input type="checkbox" className="rounded" />
-//                 <span className="text-sm text-[#666666]">{amenity.name}</span>
-//               </div>
-//               <span className="text-sm text-[#666666]">({amenity.count})</span>
-//             </label>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Star Level */}
-//       <div className="space-y-3">
-//         <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
-//           <h3 className="text-xs font-medium text-[#808080] uppercase  tracking-widest">
-//             STAR LEVEL
-//           </h3>
-//           <div className="flex items-center justify-center">
-//             <Image
-//               src={"/Fundamental Button.svg"}
-//               alt="logo"
-//               width={25}
-//               height={25}
-//             />{" "}
-//           </div>
-//         </div>
-//         <div className="space-y-2">
-//           {[1, 2, 3, 4, 5].map((stars) => (
-//             <label key={stars} className="flex items-center gap-2">
-//               <input type="checkbox" className="rounded" />
-//               <div className="flex">
-//                 {Array.from({ length: 5 }, (_, i) => (
-//                   <span
-//                     key={i}
-//                     className={`text-lg ${
-//                       i < stars ? "text-orange-400" : "text-gray-300"
-//                     }`}
-//                   >
-//                     ★
-//                   </span>
-//                 ))}
-//               </div>
-//             </label>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Guest Rating */}
-//       <div className="space-y-3">
-//         <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
-//           <h3 className="text-xs font-medium text-[#808080] uppercase  tracking-widest">
-//             GUEST RATING
-//           </h3>
-//           <div className="flex items-center justify-center">
-//             <Image
-//               src={"/Fundamental Button.svg"}
-//               alt="logo"
-//               width={25}
-//               height={25}
-//             />{" "}
-//           </div>
-//         </div>
-//         <div className="space-y-2">
-//           {[
-//             { stars: 1, count: 6 },
-//             { stars: 2, count: 0 },
-//             { stars: 3, count: 35 },
-//             { stars: 4, count: 49 },
-//             { stars: 5, count: 135 },
-//           ].map((rating) => (
-//             <label
-//               key={rating.stars}
-//               className="flex items-center justify-between"
-//             >
-//               <div className="flex items-center gap-2">
-//                 <input type="checkbox" className="rounded" />
-//                 <div className="flex">
-//                   {Array.from({ length: 5 }, (_, i) => (
-//                     <span
-//                       key={i}
-//                       className={`text-lg ${
-//                         i < rating.stars ? "text-orange-400" : "text-gray-300"
-//                       }`}
-//                     >
-//                       ★
-//                     </span>
-//                   ))}
-//                 </div>
-//               </div>
-//               <span className="text-sm text-[#666666]">({rating.count})</span>
-//             </label>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }

@@ -1,6 +1,5 @@
-import { useState } from "react";
+// CurrencyNationalitySelector.tsx
 import { ChevronDown } from "lucide-react";
-
 import {
   Select,
   SelectContent,
@@ -10,14 +9,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-const CurrencyNationalitySelector = () => {
-  const [selectedCurrency, setSelectedCurrency] = useState(
-    "United States Dollar"
-  );
-  const [selectedNationality, setSelectedNationality] = useState("Nigeria");
-  const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [nationalityOpen, setNationalityOpen] = useState(false);
 
+interface CurrencyNationalitySelectorProps {
+  selectedCurrency: string;
+  selectedNationality: string;
+  onCurrencyChange: (currency: string) => void;
+  onNationalityChange: (nationality: string) => void;
+}
+
+const CurrencyNationalitySelector = ({
+  selectedCurrency,
+  selectedNationality,
+  onCurrencyChange,
+  onNationalityChange,
+}: CurrencyNationalitySelectorProps) => {
+  
   const currencies = [
     { name: "United States Dollar", code: "USD", symbol: "$" },
     { name: "Euro", code: "EUR", symbol: "€" },
@@ -27,28 +33,29 @@ const CurrencyNationalitySelector = () => {
     { name: "Australian Dollar", code: "AUD", symbol: "A$" },
     { name: "Nigerian Naira", code: "NGN", symbol: "₦" },
     { name: "South African Rand", code: "ZAR", symbol: "R" },
-  ];
+ ];
 
   const nationalities = [
-    { name: "Nigeria", flag: "🇳🇬" },
-    { name: "United States", flag: "🇺🇸" },
-    { name: "United Kingdom", flag: "🇬🇧" },
-    { name: "Canada", flag: "🇨🇦" },
-    { name: "Australia", flag: "🇦🇺" },
-    { name: "Germany", flag: "🇩🇪" },
-    { name: "France", flag: "🇫🇷" },
-    { name: "Japan", flag: "🇯🇵" },
-    { name: "South Africa", flag: "🇿🇦" },
-    { name: "India", flag: "🇮🇳" },
-    { name: "Brazil", flag: "🇧🇷" },
-    { name: "China", flag: "🇨🇳" },
+    { name: "Nigeria", flag: "NG" },
+    { name: "United States", flag: "US" },
+    { name: "United Kingdom", flag: "GB" },
+    { name: "Canada", flag: "CA" },
+    { name: "Australia", flag: "AU" },
+    { name: "Germany", flag: "DE" },
+    { name: "France", flag: "FR" },
+    { name: "Japan", flag: "JP" },
+    { name: "South Africa", flag: "ZA" },
+    { name: "India", flag: "IN" },
+    { name: "Brazil", flag: "BR" },
+    { name: "China", flag: "CN" },
   ];
 
   const selectedCurrencyData = currencies.find(
-    (c) => c.name === selectedCurrency
+    (c) => c.code === selectedCurrency
   );
+
   const selectedNationalityData = nationalities.find(
-    (n) => n.name === selectedNationality
+    (n) => n.flag === selectedNationality
   );
 
   return (
@@ -61,9 +68,8 @@ const CurrencyNationalitySelector = () => {
         {/* Currency Dropdown */}
         <div className="relative flex-1 divide-[#333] flex gap-2 items-center border border-gray-500 divide-x rounded-lg">
           <Select
-            onValueChange={(e) => {
-              setSelectedCurrency(e);
-            }}
+            value={selectedCurrency}
+            onValueChange={onCurrencyChange}
           >
             <SelectTrigger className="w-full outline-0 text-xs border-none">
               <SelectValue placeholder="Select a currency" />
@@ -74,7 +80,7 @@ const CurrencyNationalitySelector = () => {
                   <SelectItem
                     key={currency.code}
                     className="text-xs"
-                    value={currency.name}
+                    value={currency.code}
                   >
                     {currency.name}
                   </SelectItem>
@@ -82,34 +88,29 @@ const CurrencyNationalitySelector = () => {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <div className="border-l border-l-[#333] h-full text-xs  min-w-16 flex items-center justify-center">
+          <div className="border-l border-l-[#333] h-full text-xs min-w-16 flex items-center justify-center">
             <span className="text-[#666666] font-medium">
               {selectedCurrencyData?.code} {selectedCurrencyData?.symbol}
             </span>
           </div>
         </div>
 
-        {/* Currency Display */}
-
-        {/* Flag Icon */}
-
         {/* Nationality Dropdown */}
         <div className="relative flex-1 divide-[#333] flex gap-2 items-center border border-gray-500 divide-x rounded-lg">
-          <div className="  p-2 min-w-16 flex items-center justify-center">
-            <span className="text-2xl">{selectedNationalityData?.flag}</span>
+          <div className="p-2 min-w-16 flex items-center justify-center">
+            <span className="text-1xl">{selectedNationalityData?.flag}</span>
           </div>
           <Select
-            onValueChange={(e) => {
-              setSelectedNationality(e);
-            }}
+            value={selectedNationality}
+            onValueChange={onNationalityChange}
           >
-            <SelectTrigger className="w-full border-none ">
+            <SelectTrigger className="w-full border-none">
               <SelectValue placeholder="Select a country" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {nationalities.map((nationality) => (
-                  <SelectItem key={nationality.name} value={nationality.name}>
+                  <SelectItem key={nationality.name} value={nationality.flag}>
                     {nationality.name}
                   </SelectItem>
                 ))}
