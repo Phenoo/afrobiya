@@ -563,7 +563,7 @@ export default function BookingForm() {
                             <div className="flex items-center gap-3">
                               <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
                               <div className="text-sm font-medium text-gray-900">
-                                {destination?.City.toUpperCase()} {destination.Country.toUpperCase()} - {destination.IsoCode}
+                                {destination.City !== null && destination?.City.toUpperCase()} {destination.Country.toUpperCase()} - {destination.IsoCode}
                               </div>
                             </div>
                           </div>
