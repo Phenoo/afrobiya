@@ -132,6 +132,7 @@ export default function BookingForm() {
     } else {
       setFilteredDestinations([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue]);
 
   // Close dropdown when clicking outside
