@@ -34,8 +34,10 @@ interface HotelInfo {
   facilities: string[];
   hotel_id: number;
   hotel_name: string;
-  images: Array<{ url: string; description: string }>;
+  images: { url: string; description: string; }[];
 }
+
+
 
 const StarRating = ({ rating }: { rating: number }) => {
   return (

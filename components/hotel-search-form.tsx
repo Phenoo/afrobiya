@@ -362,7 +362,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({ setLoading, setResult
   const handleDestinationSelect = (destination: typeof destinations[0]) => {
     const displayValue = `${destination.City}, ${destination.Country}`;
     setValue("destination", displayValue, { shouldValidate: true });
-    setValue("destinationCode", destination?.CityId, { shouldValidate: true });
+    setValue("destinationCode", String(destination?.CityId), { shouldValidate: true });
     setShowDropdown(false);
   };
 
@@ -479,7 +479,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({ setLoading, setResult
                           <div className="flex items-center gap-3 w-full">
                             <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
                             <div className="text-sm font-medium text-gray-900 flex-1 min-w-0">
-                              {destination?.City.toUpperCase()} {destination?.Country.toUpperCase()} - {destination?.IsoCode}
+                              {destination.City !== null && destination?.City.toUpperCase()} {destination?.Country.toUpperCase()} - {destination?.IsoCode}
                             </div>
                           </div>
                         </div>
