@@ -215,7 +215,7 @@ export default function BookingForm() {
 
   const handleDestinationSelect = (destination: typeof destinations[0]) => {
     setValue("destination", `${destination.City}, ${destination.Country}`, { shouldValidate: true });
-    setValue("destinationCode", destination.CityId, { shouldValidate: true });
+    setValue("destinationCode", destination.CityId.toString(), { shouldValidate: true });
     setShowDropdown(false);
   };
 
