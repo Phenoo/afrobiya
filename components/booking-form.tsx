@@ -52,7 +52,9 @@ export default function BookingForm() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("hotels");
   const [showDropdown, setShowDropdown] = useState(false);
-  const [filteredDestinations, setFilteredDestinations] = useState<typeof destinations>([]);
+  const [filteredDestinations, setFilteredDestinations] = useState<
+    typeof destinations
+  >([]);
   const [isSearching, setIsSearching] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -77,7 +79,9 @@ export default function BookingForm() {
   });
 
   const [checkInDate, setCheckInDate] = useState<Date>(new Date());
-  const [checkOutDate, setCheckOutDate] = useState<Date>(new Date(Date.now() + 24 * 60 * 60 * 1000));
+  const [checkOutDate, setCheckOutDate] = useState<Date>(
+    new Date(Date.now() + 24 * 60 * 60 * 1000)
+  );
   const [rooms, setRooms] = useState<Room[]>([
     { adults: 1, children: 0, childrenAges: [] },
   ]);
@@ -100,21 +104,26 @@ export default function BookingForm() {
     }
 
     setIsSearching(true);
-    
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const searchTerm = query.toLowerCase();
       const filtered = destinations.filter((dest) => {
-        const isoCode = dest.IsoCode?.toLowerCase() || '';
-        const CityId = dest.CityId !== undefined && dest.CityId !== null ? String(dest.CityId) : '';
-        const city = dest.City?.toLowerCase() || '';
-        const country = dest.Country?.toLowerCase() || '';
-        
-        return isoCode.includes(searchTerm) ||
-               CityId.includes(searchTerm) ||
-               city.includes(searchTerm) ||
-               country.includes(searchTerm);
+        const isoCode = dest.IsoCode?.toLowerCase() || "";
+        const CityId =
+          dest.CityId !== undefined && dest.CityId !== null
+            ? String(dest.CityId)
+            : "";
+        const city = dest.City?.toLowerCase() || "";
+        const country = dest.Country?.toLowerCase() || "";
+
+        return (
+          isoCode.includes(searchTerm) ||
+          CityId.includes(searchTerm) ||
+          city.includes(searchTerm) ||
+          country.includes(searchTerm)
+        );
       });
       setFilteredDestinations(filtered.slice(0, 8));
     } catch (error) {
@@ -138,7 +147,10 @@ export default function BookingForm() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -165,11 +177,11 @@ export default function BookingForm() {
   ];
 
   const starLevels = [
-    { id: 1, label: 1 }, 
-    { id: 3, label: 2 }, 
-    { id: 5, label: 3 }, 
-    { id: 7, label: 4 }, 
-    { id: 9, label: 5 }
+    { id: 1, label: 1 },
+    { id: 3, label: 2 },
+    { id: 5, label: 3 },
+    { id: 7, label: 4 },
+    { id: 9, label: 5 },
   ];
 
   const calculateNights = () => {
@@ -213,9 +225,13 @@ export default function BookingForm() {
     setValue("starLevels", newStarLevels);
   };
 
-  const handleDestinationSelect = (destination: typeof destinations[0]) => {
-    setValue("destination", `${destination.City}, ${destination.Country}`, { shouldValidate: true });
-    setValue("destinationCode", destination.CityId.toString(), { shouldValidate: true });
+  const handleDestinationSelect = (destination: (typeof destinations)[0]) => {
+    setValue("destination", `${destination.City}, ${destination.Country}`, {
+      shouldValidate: true,
+    });
+    setValue("destinationCode", destination.CityId.toString(), {
+      shouldValidate: true,
+    });
     setShowDropdown(false);
   };
 
@@ -248,7 +264,11 @@ export default function BookingForm() {
     }
   };
 
-  const updateRoom = (index: number, type: "adults" | "children" | "childrenAges", value: any) => {
+  const updateRoom = (
+    index: number,
+    type: "adults" | "children" | "childrenAges",
+    value: any
+  ) => {
     setRooms((prev) => {
       const updatedRooms = [...prev];
       const room = { ...updatedRooms[index] };
@@ -280,15 +300,19 @@ export default function BookingForm() {
     });
   };
 
-  const updateChildAge = (roomIndex: number, childIndex: number, age: number) => {
+  const updateChildAge = (
+    roomIndex: number,
+    childIndex: number,
+    age: number
+  ) => {
     setRooms((prev) => {
       const updatedRooms = [...prev];
       const room = { ...updatedRooms[roomIndex] };
-      
+
       const newAges = [...room.childrenAges];
       newAges[childIndex] = age;
       room.childrenAges = newAges;
-      
+
       updatedRooms[roomIndex] = room;
       return updatedRooms;
     });
@@ -322,12 +346,12 @@ export default function BookingForm() {
     // Add room-specific parameters
     data.rooms.forEach((room, index) => {
       const roomNumber = index + 1;
-      
+
       params.append(`adult${roomNumber}`, room.adults.toString());
       params.append(`children${roomNumber}`, room.children.toString());
-      
+
       if (room.children > 0 && room.childrenAges.length > 0) {
-        params.append(`childrenAges${roomNumber}`, room.childrenAges.join(','));
+        params.append(`childrenAges${roomNumber}`, room.childrenAges.join(","));
       }
     });
 
@@ -338,7 +362,7 @@ export default function BookingForm() {
   };
 
   return (
-    <div className="min-h-[500px] bg-white max-w-5xl shadow-md rounded-lg w-full mx-auto p-4 overflow-hidden">
+    <div className="min-h-[300px] md:min-h-[500px] bg-white max-w-5xl shadow-md rounded-lg w-full mx-auto p-4 overflow-hidden">
       <div className="w-full">
         {/* Navigation Tabs */}
         <div className="flex gap-2 mb-8 overflow-x-auto scrollbar-hide">
@@ -387,13 +411,13 @@ export default function BookingForm() {
             Vehicles
           </Button>
         </div>
-          
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col lg:flex-row gap-6 w-full">
             {/* Left Sidebar - Filters */}
             <div className="w-full lg:w-52 bg-white rounded-lg h-fit flex flex-col gap-4">
               {/* Room Basis Section */}
-              <div className="flex flex-col gap-3">
+              <div className="hidden md:flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
                   <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest">
                     Room Basis
@@ -412,7 +436,10 @@ export default function BookingForm() {
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
                   {roomBasisOptions.map((option) => (
-                    <div key={option.code} className="flex items-center space-x-3">
+                    <div
+                      key={option.code}
+                      className="flex items-center space-x-3"
+                    >
                       <Checkbox
                         id={option.code}
                         checked={selectedRoomBasis.includes(option.code)}
@@ -420,7 +447,10 @@ export default function BookingForm() {
                           handleRoomBasisChange(option.code, checked as boolean)
                         }
                       />
-                      <label htmlFor={option.code} className="text-sm text-[#666666]">
+                      <label
+                        htmlFor={option.code}
+                        className="text-sm text-[#666666]"
+                      >
                         {option.description}
                       </label>
                     </div>
@@ -429,7 +459,7 @@ export default function BookingForm() {
               </div>
 
               {/* Star Level Section */}
-              <div className="flex flex-col gap-3">
+              <div className="hidden md:flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
                   <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest">
                     Star Level
@@ -449,7 +479,10 @@ export default function BookingForm() {
                 <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
                   <div className="grid grid-cols-1 gap-2">
                     {starLevels.map((level) => (
-                      <div key={level.id} className="flex items-center space-x-3">
+                      <div
+                        key={level.id}
+                        className="flex items-center space-x-3"
+                      >
                         <Checkbox
                           id={`${level.id}`}
                           checked={selectedStarLevels.includes(level.id)}
@@ -481,7 +514,7 @@ export default function BookingForm() {
               </div>
 
               {/* More Filters Section */}
-              <div className="flex flex-col gap-3">
+              <div className="hidden md:flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
                   <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest">
                     More Filters
@@ -510,7 +543,10 @@ export default function BookingForm() {
                       setValue("refundable", checked as boolean);
                     }}
                   />
-                  <label htmlFor="refundable" className="text-sm text-[#666666]">
+                  <label
+                    htmlFor="refundable"
+                    className="text-sm text-[#666666]"
+                  >
                     Refundable Only
                   </label>
                 </div>
@@ -521,7 +557,7 @@ export default function BookingForm() {
             <div className="flex-1 w-full bg-white rounded-lg">
               {/* Search Bar with Enhanced Dropdown */}
               <div className="relative mb-3" ref={dropdownRef}>
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   value={watch("destination")}
                   placeholder="Search hotel name, city, or airport"
@@ -560,10 +596,22 @@ export default function BookingForm() {
                             className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors duration-150"
                             onClick={() => handleDestinationSelect(destination)}
                           >
-                            <div className="flex items-center gap-3">
+                            <div
+                              className="flex items-center gap-3"
+                              onClick={() => {
+                                //@ts-ignore
+                                const params = new URLSearchParams({
+                                  destinationDisplay: `${destination.City}, ${destination.Country}`,
+                                });
+                                router.push(`/hotels?${params.toString()}`);
+                              }}
+                            >
                               <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
                               <div className="text-sm font-medium text-gray-900">
-                                {destination.City !== null && destination?.City.toUpperCase()} {destination.Country.toUpperCase()} - {destination.IsoCode}
+                                {destination.City !== null &&
+                                  destination?.City.toUpperCase()}{" "}
+                                {destination.Country.toUpperCase()} -{" "}
+                                {destination.IsoCode}
                               </div>
                             </div>
                           </div>
@@ -578,23 +626,27 @@ export default function BookingForm() {
                     ) : (
                       <div className="px-4 py-4 text-center text-gray-500">
                         <Search className="w-5 h-5 mx-auto mb-1 text-gray-300" />
-                        <p className="text-sm">Start typing to search destinations</p>
+                        <p className="text-sm">
+                          Start typing to search destinations
+                        </p>
                       </div>
                     )}
                   </div>
                 )}
               </div>
               {errors.destinationCode && (
-                <div className="text-sm text-red-500 mb-2">{errors.destinationCode.message}</div>
+                <div className="text-sm text-red-500 mb-2">
+                  {errors.destinationCode.message}
+                </div>
               )}
 
               {/* Date Selection */}
-              <div className="flex flex-col sm:flex-row gap-2 mb-4">
+              <div className="hidden md:flex flex-col sm:flex-row gap-2 mb-4">
                 <div className="flex-1">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
-                       type="button" 
+                        type="button"
                         variant="outline"
                         className="w-full justify-start text-xs text-left font-normal py-3 px-4 h-auto border-gray-300 rounded-lg bg-transparent hover:bg-gray-50"
                       >
@@ -627,7 +679,9 @@ export default function BookingForm() {
                         className="w-full justify-start text-xs text-left font-normal py-3 px-4 h-auto border-gray-300 rounded-lg bg-transparent hover:bg-gray-50"
                       >
                         <CalendarIcon className="mr-2 h-5 w-5 text-gray-400" />
-                        {checkOutDate ? format(checkOutDate, "PPP") : "Check out"}
+                        {checkOutDate
+                          ? format(checkOutDate, "PPP")
+                          : "Check out"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -650,9 +704,12 @@ export default function BookingForm() {
               </div>
 
               {/* Rooms Configuration */}
-              <div className="space-y-4 mb-4">
+              <div className="hidden md:block space-y-4 mb-4">
                 {rooms.map((room, index) => (
-                  <div key={index} className="border border-gray-200 p-4 rounded-lg hover:border-gray-300 transition-colors">
+                  <div
+                    key={index}
+                    className="border border-gray-200 p-4 rounded-lg hover:border-gray-300 transition-colors"
+                  >
                     <div className="flex justify-between items-center mb-3">
                       <h4 className="text-sm font-medium text-gray-700">
                         Room {index + 1}
@@ -660,7 +717,7 @@ export default function BookingForm() {
                       {rooms.length > 1 && (
                         <Button
                           variant="ghost"
-                          type="button" 
+                          type="button"
                           size="sm"
                           onClick={() => removeRoom(index)}
                           className="text-red-500 hover:text-red-700 hover:bg-red-50"
@@ -677,10 +734,12 @@ export default function BookingForm() {
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
-                            type="button" 
+                            type="button"
                             size="sm"
                             className="flex-1 h-8 p-0 rounded bg-[#E6E6E6] hover:bg-gray-200"
-                            onClick={() => updateRoom(index, "adults", room.adults - 1)}
+                            onClick={() =>
+                              updateRoom(index, "adults", room.adults - 1)
+                            }
                             disabled={room.adults <= 1}
                           >
                             <Minus className="w-4 h-4" />
@@ -692,7 +751,9 @@ export default function BookingForm() {
                             variant="outline"
                             size="sm"
                             className="flex-1 h-8 p-0 rounded bg-[#E6E6E6] hover:bg-gray-200"
-                            onClick={() => updateRoom(index, "adults", room.adults + 1)}
+                            onClick={() =>
+                              updateRoom(index, "adults", room.adults + 1)
+                            }
                           >
                             <Plus className="w-4 h-4" />
                           </Button>
@@ -703,16 +764,20 @@ export default function BookingForm() {
                         <div className="text-[#666666] mb-2 text-sm text-left flex justify-between">
                           <span>Children</span>
                           {room.children > 0 && (
-                            <span className="text-xs text-gray-500">Max: 3</span>
+                            <span className="text-xs text-gray-500">
+                              Max: 3
+                            </span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
-                            type="button" 
+                            type="button"
                             size="sm"
                             className="flex-1 h-8 p-0 rounded bg-[#E6E6E6] hover:bg-gray-200"
-                            onClick={() => updateRoom(index, "children", room.children - 1)}
+                            onClick={() =>
+                              updateRoom(index, "children", room.children - 1)
+                            }
                             disabled={room.children <= 0}
                           >
                             <Minus className="w-4 h-4" />
@@ -722,10 +787,12 @@ export default function BookingForm() {
                           </div>
                           <Button
                             variant="outline"
-                            type="button" 
+                            type="button"
                             size="sm"
                             className="flex-1 h-8 p-0 rounded bg-[#E6E6E6] hover:bg-gray-200"
-                            onClick={() => updateRoom(index, "children", room.children + 1)}
+                            onClick={() =>
+                              updateRoom(index, "children", room.children + 1)
+                            }
                             disabled={room.children >= 3}
                           >
                             <Plus className="w-4 h-4" />
@@ -757,7 +824,10 @@ export default function BookingForm() {
                                 <SelectGroup>
                                   <SelectLabel>Age</SelectLabel>
                                   {Array.from({ length: 17 }, (_, n) => (
-                                    <SelectItem key={n} value={(n + 1).toString()}>
+                                    <SelectItem
+                                      key={n}
+                                      value={(n + 1).toString()}
+                                    >
                                       {n + 1} years old
                                     </SelectItem>
                                   ))}
@@ -783,7 +853,7 @@ export default function BookingForm() {
               </div>
 
               {/* Currency and Nationality Selection */}
-              <div className="mb-6">
+              <div className="hidden md:block mb-6">
                 <CurrencyNationalitySelector
                   selectedCurrency={currency}
                   selectedNationality={nationality}
@@ -793,7 +863,7 @@ export default function BookingForm() {
               </div>
 
               {/* Search Button */}
-              <Button 
+              <Button
                 type="submit"
                 className="w-full py-4 text-base font-medium bg-[#0000FF] hover:bg-blue-700 rounded-lg transition-colors duration-200"
                 disabled={!watch("destinationCode")}

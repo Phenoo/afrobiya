@@ -34,7 +34,7 @@ export function PhotoInfo({
   const displayImages = images.length > 0 ? images : [];
 
   // Transform the hotel images to match the expected format if needed
-  const transformedImages = displayImages.map(img => ({
+  const transformedImages = displayImages.map((img) => ({
     src: img.url || "/placeholder.svg",
     alt: img.description || `${hotelName} image`,
     description: img.description || `${hotelName} image`,
@@ -61,14 +61,16 @@ export function PhotoInfo({
   const currentImage = transformedImages[currentImageIndex];
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose} defaultOpen={isOpen}>
       <DialogContent className="md:max-w-4xl w-full max-h-[90vh] h-auto p-0 bg-white rounded-2xl overflow-hidden flex flex-col">
         {/* Header */}
-         <div className="flex items-center justify-between p-4 border-b bg-white flex-shrink-0">
-          <DialogTitle aria-describedby={undefined} className="text-lg font-semibold m-0">
+        <div className="flex items-center justify-between p-4 border-b bg-white flex-shrink-0">
+          <DialogTitle
+            aria-describedby={undefined}
+            className="text-lg font-semibold m-0"
+          >
             {hotelName} - Photos
           </DialogTitle>
-          
         </div>
 
         {/* Main image container with fixed height */}
@@ -84,7 +86,7 @@ export function PhotoInfo({
                 priority
                 sizes="(max-width: 768px) 100vw, 800px"
               />
-              
+
               {/* Description overlay */}
               {currentImage?.description && (
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
@@ -107,11 +109,11 @@ export function PhotoInfo({
               >
                 <ChevronLeft className="w-5 h-5 text-[#808080]" />
               </button>
-              
+
               <div className="text-center text-sm text-gray-600">
                 {currentImageIndex + 1} of {transformedImages.length} photos
               </div>
-              
+
               <button
                 onClick={goToNext}
                 className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

@@ -21,11 +21,11 @@ export default function HotelPoliciesDialog({
   hotelName,
 }: HotelPoliciesDialogProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose} defaultOpen={isOpen}>
       <DialogContent className="md:max-w-4xl max-h-[700px] overflow-y-auto">
         <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <DialogTitle className="text-xl font-semibold">
-            Hotel Policies
+            {hotelName} Hotel Policies
           </DialogTitle>
         </DialogHeader>
 
