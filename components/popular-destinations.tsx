@@ -57,7 +57,7 @@ const destinations = [
 
 export function PopularDestinations() {
   return (
-    <section className="pb-16 pt-[700px] lg:pt-48 bg-[#F8F9FA] w-full  px-6">
+    <section className="pb-16 pt-8 md:pt-[700px] lg:pt-48 bg-[#F8F9FA] w-full  px-6">
       <div className="max-w-7xl w-full relative mx-auto">
         <Carousel
           opts={{

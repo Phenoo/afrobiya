@@ -368,7 +368,7 @@ export default function BookingForm() {
         <div className="flex gap-2 mb-8 overflow-x-auto scrollbar-hide">
           <Button
             variant={activeTab === "flights" ? "default" : "ghost"}
-            className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-5 rounded-full whitespace-nowrap ${
+            className={`flex items-center gap-2 text-xs md:text-sm px-4 sm:px-6 py-3 sm:py-5 rounded-full whitespace-nowrap ${
               activeTab === "flights"
                 ? "bg-[#0010DC] text-white hover:bg-[#0010DC]"
                 : "text-[#0010DC] hover:text-gray-800"
@@ -384,7 +384,7 @@ export default function BookingForm() {
           </Button>
           <Button
             variant={activeTab === "hotels" ? "default" : "ghost"}
-            className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-5 rounded-full whitespace-nowrap ${
+            className={` text-xs md:text-sm flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-5 rounded-full whitespace-nowrap ${
               activeTab === "hotels"
                 ? "bg-[#3140FF] text-white hover:bg-[#3140FF]"
                 : "text-[#0010DC] hover:text-gray-800"
@@ -396,7 +396,7 @@ export default function BookingForm() {
           </Button>
           <Button
             variant={activeTab === "vehicles" ? "default" : "ghost"}
-            className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-5 rounded-full whitespace-nowrap ${
+            className={` text-xs md:text-sm flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-5 rounded-full whitespace-nowrap ${
               activeTab === "vehicles"
                 ? "bg-[#0010DC] text-white hover:bg-[#0010DC]"
                 : "text-[#0010DC] hover:text-gray-800"
