@@ -7,12 +7,24 @@ import { Filter, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 // Create a separate component that uses useSearchParams
 function HotelsContent() {
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any[]>([]);
-  
+
   const router = useRouter();
   const params = useSearchParams();
 
@@ -62,7 +74,19 @@ function HotelsContent() {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <HotelFilters />
+            <Sheet
+              open={showFilters}
+              defaultOpen={showFilters}
+              onOpenChange={() => setShowFilters(false)}
+            >
+              <SheetContent className="md:w-full w-full p-2">
+                <SheetHeader>
+                  <SheetTitle></SheetTitle>
+                  <SheetDescription></SheetDescription>
+                </SheetHeader>
+                <HotelFilters onFiltersApply={() => setShowFilters(false)} />
+              </SheetContent>
+            </Sheet>
           </div>
 
           {showFilters && (
@@ -83,17 +107,19 @@ function HotelsContent() {
 
 const HotelsPage = () => {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading hotels...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading hotels...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <HotelsContent />
     </Suspense>
   );
-}
+};
 
 export default HotelsPage;
