@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { useRouter,usePathname,useSearchParams  } from 'next/navigation';
 import {
   MapPin,
   Wifi,
@@ -9,240 +10,43 @@ import {
   ArrowUpDown,
   ChevronDown,
   ChevronUp,
+  Star,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import HotelPoliciesDialog from "./hotel-info-dilaog";
 import HotelInfoSheet from "./hotel-info-sheet";
 import RoomInfoSheet from "./room-info";
 import Link from "next/link";
+import { getFacilityIcon, FacilityIcon } from './facilities-icons';
+interface HotelResultsProps {
+  loading?: boolean;
+}
 
-const hotels = [
-  {
-    id: 1,
-    name: "The Lagos Continental Hotel",
-    location: "Lagos, Nigeria",
-    image: "/lagos-continental.png",
-    category: "Best Deal",
-    categoryType: "luxury",
-    amenities: ["Free Internet Access", "Free Parking"],
-    rating: 5,
-    reviews: 5,
-    price: 180,
-  },
-  {
-    id: 2,
-    name: "Vertigo Hotel",
-    location: "Lagos, Nigeria",
-    image: "/vertigo-hotel.png",
-    category: "Luxury",
-    categoryType: "luxury",
-    amenities: ["Free Internet Access", "Free Parking"],
-    rating: 5,
-    reviews: 5,
-    price: 180,
-  },
-  {
-    id: 3,
-    name: "Elegance Suites Hotels",
-    location: "Lagos, Nigeria",
-    image: "/elegance-suites.png",
-    category: "Economy",
-    categoryType: "economy",
-    amenities: ["Free Internet Access", "Free Parking"],
-    rating: 5,
-    reviews: 5,
-    price: 180,
-  },
-  {
-    id: 4,
-    name: "The Federal Palace Hotel and Casino",
-    location: "Lagos, Nigeria",
-    image: "/federal-palace.png",
-    category: "",
-    categoryType: "",
-    amenities: ["Free Internet Access", "Free Parking"],
-    rating: 5,
-    reviews: 5,
-    price: 180,
-  },
-  {
-    id: 5,
-    name: "Boss Hotels & Suites",
-    location: "Lagos, Nigeria",
-    image: "/boss-hotels.png",
-    category: "",
-    categoryType: "",
-    amenities: ["Free Internet Access", "Free Parking"],
-    rating: 5,
-    reviews: 5,
-    price: 180,
-  },
-  {
-    id: 6,
-    name: "Sheraton Lagos Hotel",
-    location: "Lagos, Nigeria",
-    image: "/sheraton-lagos.png",
-    category: "Luxury",
-    categoryType: "luxury",
-    amenities: ["Free Internet Access", "Free Parking"],
-    rating: 5,
-    reviews: 5,
-    price: 180,
-  },
-];
+const HotelResults = ({ loading, results }: { loading?: boolean; results: any }) => {
 
-const hotelRooms = {
-  1: [
-    {
-      id: 1,
-      name: "Deluxe Ocean View Room",
-      image: "/hotel-room-ocean-view.png",
-      amenities: ["Free WiFi", "Ocean View", "King Bed"],
-      size: "35 sqm",
-      guests: 2,
-      price: 180,
-      originalPrice: 220,
-      discount: 18,
-    },
-    {
-      id: 2,
-      name: "Executive Suite",
-      image: "/hotel-restaurant-interior.png",
-      amenities: ["Free WiFi", "City View", "Separate Living Area"],
-      size: "55 sqm",
-      guests: 4,
-      price: 280,
-      originalPrice: 350,
-      discount: 20,
-    },
-    {
-      id: 3,
-      name: "Standard Double Room",
-      image: "/elegant-hotel-lobby.png",
-      amenities: ["Free WiFi", "Garden View", "Double Bed"],
-      size: "25 sqm",
-      guests: 2,
-      price: 120,
-      originalPrice: 150,
-      discount: 20,
-    },
-  ],
-  2: [
-    {
-      id: 1,
-      name: "Premium King Room",
-      image: "/hotel-room-ocean-view.png",
-      amenities: ["Free WiFi", "City View", "King Bed"],
-      size: "40 sqm",
-      guests: 2,
-      price: 200,
-      originalPrice: 240,
-      discount: 17,
-    },
-    {
-      id: 2,
-      name: "Junior Suite",
-      image: "/hotel-restaurant-interior.png",
-      amenities: ["Free WiFi", "Balcony", "Seating Area"],
-      size: "45 sqm",
-      guests: 3,
-      price: 250,
-      originalPrice: 300,
-      discount: 17,
-    },
-  ],
-  3: [
-    {
-      id: 1,
-      name: "Economy Double Room",
-      image: "/elegant-hotel-lobby.png",
-      amenities: ["Free WiFi", "Air Conditioning", "Double Bed"],
-      size: "20 sqm",
-      guests: 2,
-      price: 90,
-      originalPrice: 110,
-      discount: 18,
-    },
-    {
-      id: 2,
-      name: "Family Room",
-      image: "/hotel-room-ocean-view.png",
-      amenities: ["Free WiFi", "2 Double Beds", "Mini Fridge"],
-      size: "30 sqm",
-      guests: 4,
-      price: 140,
-      originalPrice: 170,
-      discount: 18,
-    },
-  ],
-  4: [
-    {
-      id: 1,
-      name: "Casino View Room",
-      image: "/hotel-restaurant-interior.png",
-      amenities: ["Free WiFi", "Casino View", "Queen Bed"],
-      size: "32 sqm",
-      guests: 2,
-      price: 160,
-      originalPrice: 200,
-      discount: 20,
-    },
-  ],
-  5: [
-    {
-      id: 1,
-      name: "Business Suite",
-      image: "/elegant-hotel-lobby.png",
-      amenities: ["Free WiFi", "Work Desk", "King Bed"],
-      size: "38 sqm",
-      guests: 2,
-      price: 170,
-      originalPrice: 210,
-      discount: 19,
-    },
-  ],
-  6: [
-    {
-      id: 1,
-      name: "Luxury King Room",
-      image: "/hotel-room-ocean-view.png",
-      amenities: ["Free WiFi", "City View", "King Bed", "Marble Bathroom"],
-      size: "42 sqm",
-      guests: 2,
-      price: 220,
-      originalPrice: 280,
-      discount: 21,
-    },
-    {
-      id: 2,
-      name: "Presidential Suite",
-      image: "/hotel-restaurant-interior.png",
-      amenities: [
-        "Free WiFi",
-        "Panoramic View",
-        "Living Room",
-        "Butler Service",
-      ],
-      size: "85 sqm",
-      guests: 4,
-      price: 450,
-      originalPrice: 600,
-      discount: 25,
-    },
-  ],
-};
-
-export default function HotelResults() {
   const [isPoliciesDialogOpen, setIsPoliciesDialogOpen] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState<string>("");
   const [isHotelInfoSheetOpen, setIsHotelInfoSheetOpen] = useState(false);
-  const [selectedHotelForInfo, setSelectedHotelForInfo] = useState<string>("");
-  const [showRoomsForHotel, setShowRoomsForHotel] = useState<number | null>(
-    null
-  );
+  const [selectedHotelForInfo, setSelectedHotelForInfo] = useState<HotelType["hotelInfo"][]>([]);
+  const [showRoomsForHotel, setShowRoomsForHotel] = useState<number | null>(null);
   const [isRoomInfoSheetOpen, setIsRoomInfoSheetOpen] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState<string>("");
+  const [selectedRoomFeatures, setSelectedRoomFeatures] = useState<any[]>([]);
+  const [selectedRoom, setSelectedRoom] = useState<{
+    Category: string;
+    Currency: string;
+    HotelSearchCode: string;
+    Remark: string;
+    Rooms: string[];
+    Special: string;
+    TotalPrice: number;
+    RoomBasis: string;
+  } | undefined>(undefined);
+  const [destinationname, setDestinationname] = useState<string | null>("");
+
+  const router = useRouter();
+  const params = useSearchParams();
+  //console.log('Search params:', Array.from(params.entries()));
 
   const [showRooms, setShowRooms] = useState(false);
   const handlePoliciesClick = (hotelName: string) => {
@@ -250,26 +54,134 @@ export default function HotelResults() {
     setIsPoliciesDialogOpen(true);
   };
 
-  const handleShowRoomsClick = (hotelId: number) => {
-    setShowRoomsForHotel(showRoomsForHotel === hotelId ? null : hotelId);
+  const handleShowRoomsClick = (hotelCode: number) => {
+    setShowRoomsForHotel(showRoomsForHotel === hotelCode ? null : hotelCode);
   };
 
-  const handleHotelInfoClick = (hotelName: string) => {
-    setSelectedHotelForInfo(hotelName);
+  const handleHotelInfoClick = (hotelInfo: HotelType["hotelInfo"][]) => {
+    setSelectedHotelForInfo(hotelInfo);
     setIsHotelInfoSheetOpen(true);
   };
 
-  const handleRoomInfoClick = (roomName: string) => {
-    setSelectedRoom(roomName);
+  const handleRoomInfoClick = (room: {
+    Category: string;
+    Currency: string;
+    HotelSearchCode: string;
+    Remark: string;
+    Rooms: string[];
+    Special: string;
+    TotalPrice: number;
+    RoomBasis: string;
+  }, roomFeatures: any[]) => {
+    setSelectedRoom(room);
+    setSelectedRoomFeatures(roomFeatures);
     setIsRoomInfoSheetOpen(true);
+  };
+
+    useEffect(() => {
+      const destination = params.get("destinationDisplay");
+      if (destination) {
+        setDestinationname(destination);
+      }
+  }, [params]);
+
+  //console.log("Hotelinfo:", selectedHotelForInfo);
+
+  type HotelType = {
+    HotelSearchCode: number;
+    HotelName: string;
+    HotelImage: string;
+    CxlDeadLine: string;
+    Rooms: string[];
+    TotalPrice: string;
+    HotelCode: number;
+    Offers: {
+      TotalPrice: number;
+      Currency: string;
+      Rooms: string[];
+      Special?: string;
+      Remark?: string;
+      RoomBasis?: string;
+      HotelSearchCode?: string;
+    }[];
+    RoomFacilities: string[];
+    Location: string;
+    hotelInfo: {
+      address: string;
+      description: string;
+      facilities: string[];
+      category: number;
+      images: { url: string; description: string; }[];
+      city_code: number;
+      coordinates: { longitude: number; latitude: number };
+      hotel_id: number;
+      hotel_name: string;
+    };
+  };
+
+  function FacilityList({ 
+    facilities, 
+    maxFacilities 
+  }: { 
+    facilities: string[]; 
+    maxFacilities?: number;
+  }) {
+    // Determine which facilities to display
+    const facilitiesToDisplay = maxFacilities 
+      ? facilities.slice(0, maxFacilities)
+      : facilities;
+
+    return (
+      <div className="flex flex-col items-start gap-1 text-sm text-[#808080]">
+        {facilitiesToDisplay.map((facility, index) => {
+          const IconComponent = getFacilityIcon(facility);
+          return (
+            <div key={index} className="flex items-center gap-1">
+              <IconComponent className="h-4 w-4" />
+              <span>{facility}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+   const StarRating = ({ rating }: { rating: number }) => {
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`h-4 w-4 ${
+              star <= rating ? "fill-[#FC5D01] text-[#FC5D01]" : "text-gray-300"
+            }`}
+          />
+        ))}
+      </div>
+    );
   };
 
   return (
     <>
+      {loading ? (
+
+        <div className="flex items-center justify-center" style={{ height: "50vh" }}>
+          <Image
+            alt="Aforliyah preloader"
+            width={100}
+            height={100}
+            src="/aforliyah_preloader.gif"
+            className="object-contain"
+          />
+        </div>
+        
+      ) : (
+
+      <div>
       <div className="space-y-6">
         {/* Results Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h2 className="text-lg sm:text-xl">794 hotels in Abuja, Nigeria</h2>
+          <h2 className="text-lg sm:text-xl">{results['hotels']?.length > 0 ? `${results["pagination"] && results["pagination"]['total']} hotels in ${destinationname}` : "No hotels found"}</h2>
           <Button
             variant="outline"
             className="gap-0 text-[#666666] border text-xs border-[#CCCCCC] bg-transparent w-fit"
@@ -281,25 +193,20 @@ export default function HotelResults() {
 
         {/* Hotel Cards */}
         <div className="space-y-4">
-          {hotels.map((hotel) => (
+          {results['hotels']?.map((hotel: HotelType, index: number) => (
             <div
-              key={hotel.id}
+              key={hotel.HotelCode}
               className="bg-white hover:border hover:border-[#0000ff] flex flex-col border rounded-lg overflow-hidden"
             >
               <div className="flex flex-col lg:flex-row gap-0">
                 <div className="relative w-full lg:w-48 h-48 lg:h-60 flex-shrink-0">
                   <Image
-                    src={hotel.image || "/placeholder.svg"}
-                    alt={hotel.name}
+                    src={hotel.HotelImage || "/placeholder.svg"}
+                    alt={hotel.HotelName}
                     width={192}
                     height={240}
                     className="object-cover w-full h-full lg:rounded-l-lg"
                   />
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
-                    <div className="w-2 h-2 bg-white rounded-full opacity-60"></div>
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                    <div className="w-2 h-2 bg-white rounded-full opacity-60"></div>
-                  </div>
                 </div>
 
                 {/* Hotel Info */}
@@ -307,30 +214,11 @@ export default function HotelResults() {
                   <div className="flex justify-between flex-col gap-4 p-4 flex-1">
                     <div className="space-y-2">
                       {/* Category Badge */}
-                      {hotel.category && (
-                        <div className="flex flex-wrap gap-2">
-                          {hotel.category === "Best Deal" && (
-                            <span className="border-[#CA4A01] border text-[#CA4A01] px-2 py-1 rounded-3xl text-xs font-medium">
-                              Best Deal
-                            </span>
-                          )}
-                          <span
-                            className={`px-2 py-1 rounded-3xl text-xs ${
-                              hotel.categoryType === "luxury"
-                                ? "bg-[#FEDFCC] text-black"
-                                : hotel.categoryType === "economy"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {hotel.category}
-                          </span>
-                        </div>
-                      )}
+                      <StarRating rating={Number(hotel?.hotelInfo.category) || 0} />
 
                       {/* Hotel Name */}
                       <h3 className="text-lg lg:text-xl font-semibold">
-                        {hotel.name}
+                        {hotel.HotelName} <span></span>
                       </h3>
 
                       {/* Location */}
@@ -341,60 +229,29 @@ export default function HotelResults() {
                           width={16}
                           height={16}
                         />
-                        <span className="text-sm">{hotel.location}</span>
+                        <span className="text-sm">{hotel.hotelInfo.address}</span>
                       </div>
-
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-[#808080]">
-                        <div className="flex items-center gap-1">
-                          <Wifi className="h-4 w-4" />
-                          <span>Free Internet Access</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Car className="h-4 w-4" />
-                          <span>Free Parking</span>
-                        </div>
-                      </div>
-
-                      {/* Rating */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-medium">
-                          5-Star Hotel
-                        </span>
-                        <div className="flex">
-                          {Array.from({ length: 5 }, (_, i) => (
-                            <span key={i} className="text-orange-400 text-sm">
-                              ★
-                            </span>
-                          ))}
-                        </div>
-                        <span className="text-sm text-[#808080]">
-                          ({hotel.reviews})
-                        </span>
-                      </div>
+                      {/* Facilities */}
+                      {hotel.hotelInfo?.facilities && (
+                        <FacilityList facilities={hotel.hotelInfo.facilities} maxFacilities={5} />
+                      )}
                     </div>
 
                     <div className="flex flex-wrap gap-4 lg:gap-4 items-center text-[#808080]">
                       <Button
                         variant="link"
                         className="p-0 h-auto text-xs tracking-widest text-orange-600"
-                        onClick={() => handleHotelInfoClick(hotel.name)}
+                        onClick={() => handleHotelInfoClick([hotel.hotelInfo])}
                       >
                         Hotel Info
                       </Button>
                       <Button
-                        variant="link"
-                        className="p-0 text-xs tracking-widest h-auto text-[#FC5D01]"
-                        onClick={() => handlePoliciesClick(hotel.name)}
-                      >
-                        Hotel Policies
-                      </Button>
-                      <Button
-                        onClick={() => handleShowRoomsClick(hotel.id)}
+                        onClick={() => handleShowRoomsClick(hotel.HotelCode)}
                         className="h-auto hover:bg-transparent bg-transparent border border-[#808080] text-[#808080] text-xs rounded p-2"
                       >
-                        {showRoomsForHotel === hotel.id ? "Close " : "Show "}
+                        {showRoomsForHotel === hotel.HotelCode ? "Close " : "Show "}
                         rooms
-                        {showRoomsForHotel === hotel.id ? (
+                        {showRoomsForHotel === hotel.HotelCode ? (
                           <ChevronUp className="h-3 w-3 ml-2" />
                         ) : (
                           <ChevronDown className="h-3 w-3 ml-2" />
@@ -406,8 +263,8 @@ export default function HotelResults() {
                   <div className="text-center flex flex-row lg:flex-col border-t lg:border-t-0 lg:border-l p-4 justify-between lg:justify-between lg:w-32">
                     <div className="flex flex-col gap-1">
                       <div className="text-xs text-[#808080]">Starting at</div>
-                      <div className="text-xl lg:text-2xl font-medium text-[#0000FF]">
-                        ${hotel.price}
+                      <div className="text-sm lg:text-1xl font-medium text-[#0000FF]">
+                        {hotel['Offers'][0]?.Currency}{Number(hotel['Offers'][0]?.TotalPrice).toFixed(2)}
                       </div>
                       <div className="text-xs text-[#808080]">Per night</div>
                     </div>
@@ -423,65 +280,46 @@ export default function HotelResults() {
               {/* Expanded Rooms Section */}
               <div
                 className={`w-full transition-all duration-500 ease-in-out  overflow-hidden ${
-                  showRoomsForHotel === hotel.id &&
-                  hotelRooms[hotel.id as keyof typeof hotelRooms]
-                    ? "max-h-[2000px] opacity-100"
+                  showRoomsForHotel === hotel.HotelCode 
+                    ? "opacity-100"
                     : "max-h-0 opacity-0"
                 }`}
               >
-                {hotelRooms[hotel.id as keyof typeof hotelRooms] && (
+                {hotel['Offers'] as unknown[] && (
                   <>
                     <div className="py-4">
                       <div className="space-y-3 w-full">
-                        {hotelRooms[hotel.id as keyof typeof hotelRooms].map(
-                          (room, index) => (
+                        {hotel['Offers']?.map((room: any, index: number) => (
                             <div
-                              key={room.id}
-                              className={`bg-white flex flex-col md:px-8 border-t p-4 lg:flex-row gap-4 transform transition-all duration-300 ease-out cursor-pointer  ${
-                                showRoomsForHotel === hotel.id
-                                  ? "translate-y-0 opacity-100"
-                                  : "translate-y-4 opacity-0"
-                              }`}
+                              key={index}
+                              className='bg-white flex flex-col md:px-8 border-t p-4 lg:flex-row gap-4 transform transition-all duration-300 ease-out cursor-pointer translate-y-0 opacity-100'
                               style={{
-                                transitionDelay:
-                                  showRoomsForHotel === hotel.id
-                                    ? `${index * 100}ms`
-                                    : "0ms",
+                                transitionDelay: `${index * 100}ms`
                               }}
                             >
                               <div className="flex flex-col lg:flex-row gap-4 w-full">
+
                                 <div className="relative w-full lg:w-48 h-48 flex-shrink-0">
                                   <Image
-                                    src={hotel.image || "/placeholder.svg"}
-                                    alt={hotel.name}
+                                    src={"/placeholder.svg"}
+                                    alt={"Hotel Image"}
                                     width={192}
                                     height={192}
                                     className="object-cover w-full h-full lg:rounded-lg"
                                   />
-                                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
-                                    <div className="w-2 h-2 bg-white rounded-full opacity-60"></div>
-                                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                                    <div className="w-2 h-2 bg-white rounded-full opacity-60"></div>
-                                  </div>
                                 </div>
-
+                                
                                 <div className="flex-1 flex flex-col lg:flex-row justify-between">
                                   <div className="flex justify-between flex-col gap-4 py-1 px-4 flex-1">
                                     <div className="space-y-2">
                                       <h3 className="text-lg lg:text-xl font-semibold">
-                                        {hotel.name}
+                                        {room['Rooms'][0]}
                                       </h3>
 
-                                      <div className="flex flex-col items-start gap-1 text-sm text-[#808080]">
-                                        <div className="flex items-center gap-1">
-                                          <Wifi className="h-4 w-4" />
-                                          <span>Free Internet Access</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                          <Car className="h-4 w-4" />
-                                          <span>Free Parking</span>
-                                        </div>
-                                      </div>
+                                      {hotel.RoomFacilities?.length > 0 && (
+                                        <FacilityList facilities={hotel.RoomFacilities} maxFacilities={5} />
+                                      )}
+
                                     </div>
 
                                     <div className="flex flex-wrap gap-2 lg:gap-4 items-center text-[#808080]">
@@ -489,39 +327,30 @@ export default function HotelResults() {
                                         variant="link"
                                         className="p-0 h-auto text-xs tracking-widest text-orange-600"
                                         onClick={() =>
-                                          handleRoomInfoClick(room.name)
+                                          handleRoomInfoClick(room, hotel.RoomFacilities || [])
                                         }
                                       >
                                         Room Info
-                                      </Button>
-                                      <Button
-                                        variant="link"
-                                        className="p-0 text-xs tracking-widest h-auto text-[#FC5D01]"
-                                        onClick={() =>
-                                          handlePoliciesClick(hotel.name)
-                                        }
-                                      >
-                                        Cancellation Policy
                                       </Button>
                                     </div>
                                   </div>
 
                                   <div className="text-center flex flex-row lg:flex-col border-t lg:border-t-0  p-4 justify-between lg:justify-between lg:w-32">
                                     <div className="flex flex-col gap-1">
-                                      <div className="text-xl lg:text-2xl font-medium text-[#0000FF]">
-                                        ${hotel.price}
+                                      <div className="text-sm font-medium text-[#0000FF]">
+                                        {room.Currency}{room.TotalPrice}
                                       </div>
                                       <div className="text-xs text-[#808080]">
                                         Per night
                                       </div>
                                     </div>
-                                    <div className="text-xs text-center text-[#808080]">
+                                    {/*<div className="text-xs text-center text-[#808080]">
                                       <span className="text-black text-base font-medium">
-                                        ${hotel.price}
+                                        {room.Currency}{room.TotalPrice}
                                       </span>
                                       <br />
                                       Total
-                                    </div>
+                                    </div>*/}
                                     <div className="lg:mt-2">
                                       <Link href={"/booking-payment"}>
                                         <Button
@@ -536,17 +365,21 @@ export default function HotelResults() {
                                 </div>
                               </div>
                             </div>
+                            
                           )
                         )}
 
+                        
+
                         <div className="p-4">
                           <Button
-                            onClick={() => handleShowRoomsClick(hotel.id)}
+                            onClick={() => handleShowRoomsClick(hotel.HotelCode)}
                             className=" w-full hover:bg-white border-2 bg-transparent text-[#888] border-[#ccc] "
                           >
                             Close Rooms <ChevronUp className="mr-2 h-4 w-4" />
                           </Button>
                         </div>
+
                       </div>
                     </div>
                   </>
@@ -555,31 +388,67 @@ export default function HotelResults() {
             </div>
           ))}
         </div>
+        {/* Pagination Controls */}
+        {results['pagination'] && results['pagination']['total_pages'] > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+            <Button
+              onClick={() => {
+                if (results['pagination']['current_page'] > 1) {
+                  const paramsObj = new URLSearchParams(params.toString());
+                  paramsObj.set('page', String(results['pagination']['current_page'] - 1));
+                  router.push(`?${paramsObj.toString()}`);
+                }
+              }}
+              variant="outline"
+              size="sm"
+              className="gap-1 bg-transparent"
+              disabled={results['pagination']['current_page'] === 1}
+              style={{ cursor: 'pointer' }}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-          <Button variant="outline" size="sm" className="gap-1 bg-transparent">
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </Button>
+            <div className="flex gap-1 flex-wrap justify-center">
+              {[...Array(results['pagination']['total_pages'])].map((_, index) => (
+                <Button
+                  key={index}
+                  variant={results['pagination']['current_page'] === index + 1 ? "default" : "outline"}
+                  size="sm"
+                  className="w-8 h-8 p-0"
+                  onClick={() => {
+                    if (results['pagination']['current_page'] !== index + 1) {
+                      const paramsObj = new URLSearchParams(params.toString());
+                      paramsObj.set('page', String(index + 1));
+                      router.push(`?${paramsObj.toString()}`);
+                    }
+                  }}
+                  disabled={results['pagination']['current_page'] === index + 1}
+                >
+                  {index + 1}
+                </Button>
+              ))}
+            </div>
 
-          <div className="flex gap-1 flex-wrap justify-center">
-            {[1, 2, 3, "...", 8, 9, 10].map((page, index) => (
-              <Button
-                key={index}
-                variant={page === 1 ? "default" : "outline"}
-                size="sm"
-                className="w-8 h-8 p-0"
-              >
-                {page}
-              </Button>
-            ))}
+            <Button
+              onClick={() => {
+                if (results['pagination']['current_page'] < results['pagination']['total_pages']) {
+                  const paramsObj = new URLSearchParams(params.toString());
+                  paramsObj.set('page', String(results['pagination']['current_page'] + 1));
+                  router.push(`?${paramsObj.toString()}`);
+                }
+              }}
+              variant="outline"
+              size="sm"
+              className="gap-1 bg-transparent"
+              disabled={results['pagination']['current_page'] === results['pagination']['total_pages']}
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
+        )}
 
-          <Button variant="outline" size="sm" className="gap-1 bg-transparent">
-            Next
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
       </div>
       <HotelPoliciesDialog
         isOpen={isPoliciesDialogOpen}
@@ -588,14 +457,26 @@ export default function HotelResults() {
       />
       <HotelInfoSheet
         isOpen={isHotelInfoSheetOpen}
-        onClose={() => setIsHotelInfoSheetOpen(false)}
-        hotelName={selectedHotelForInfo}
+         onClose={() => {
+          setIsHotelInfoSheetOpen(false);
+          setSelectedHotelForInfo([]);
+        }}
+        hotelinfo={selectedHotelForInfo}
       />
+
       <RoomInfoSheet
         isOpen={isRoomInfoSheetOpen}
         onClose={() => setIsRoomInfoSheetOpen(false)}
-        roomName={selectedRoom}
+        roomData={selectedRoom}
+        roomFeatures={selectedRoomFeatures}
       />
+      
+
+      </div>
+      )}
+      
     </>
   );
 }
+
+export default HotelResults;

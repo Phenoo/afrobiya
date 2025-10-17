@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Heart, Star } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { getFacilityIcon, FacilityIcon } from './facilities-icons';
 
 import { PhotoInfo } from "./info-gallery";
 
@@ -21,8 +22,22 @@ import { Card } from "./ui/card";
 interface HotelInfoSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  hotelName: string;
+  hotelinfo: HotelInfo[];
 }
+
+interface HotelInfo {
+  address: string;
+  category: number;
+  city_code: number;
+  coordinates: { longitude: number; latitude: number };
+  description: string;
+  facilities: string[];
+  hotel_id: number;
+  hotel_name: string;
+  images: { url: string; description: string; }[];
+}
+
+
 
 const StarRating = ({ rating }: { rating: number }) => {
   return (
@@ -42,10 +57,26 @@ const StarRating = ({ rating }: { rating: number }) => {
 export default function HotelInfoSheet({
   isOpen,
   onClose,
-  hotelName,
+  hotelinfo,
 }: HotelInfoSheetProps) {
+  const [selectedHotelForGallery, setSelectedHotelForGallery] = useState<{
+    hotelName: string;
+    images: any[];
+  }>({ hotelName: "", images: [] });
+  const [currentHotelForGallery, setCurrentHotelForGallery] = useState<HotelInfo | null>(null);
+
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState("about");
+   const hotel = hotelinfo[0];
+
+  if (!hotel) return null;
+
+  // Handler function
+  const handlePhotoGalleryClick = (hotelName: string, images: any[]) => {
+    setSelectedHotelForGallery({ hotelName, images });
+    setIsPhotoGalleryOpen(true);
+  };
+
   const amenities = [
     "Swimming Pool",
     "Free Internet Access",
@@ -66,12 +97,36 @@ export default function HotelInfoSheet({
     { stars: 1, percentage: 0 },
   ];
   const tabs = [
-    { id: "overview", label: "Overview & Photos" },
-    { id: "about", label: "About" },
-    { id: "amenities", label: "Amenities" },
-    { id: "reviews", label: "Reviews" },
-    { id: "map", label: "Map" },
+    { id: "about", label: "Overview" },
+    { id: "amenities", label: "Facilities" }
   ];
+
+  function FacilityList({ 
+      facilities, 
+      maxFacilities 
+    }: { 
+      facilities: string[]; 
+      maxFacilities?: number;
+    }) {
+      // Determine which facilities to display
+      const facilitiesToDisplay = maxFacilities 
+        ? facilities.slice(0, maxFacilities)
+        : facilities;
+  
+      return (
+        <div className="flex flex-col items-start gap-1 text-sm text-[#808080]">
+          {facilitiesToDisplay.map((facility, index) => {
+            const IconComponent = getFacilityIcon(facility);
+            return (
+              <div key={index} className="flex items-center gap-1">
+                <IconComponent className="h-4 w-4" />
+                <span>{facility}</span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
 
   return (
     <>
@@ -83,7 +138,7 @@ export default function HotelInfoSheet({
           <div className="p-4">
             <SheetHeader className="p-0  py-4">
               <SheetTitle className="text-left tracking-widest text-sm text-[#808080] font-normal">
-                Hotel Info • {hotelName}
+                Hotel Info • {hotel.hotel_name}
               </SheetTitle>
             </SheetHeader>
 
@@ -93,7 +148,7 @@ export default function HotelInfoSheet({
                 {/* Main Image */}
                 <div className="relative rounded-lg overflow-hidden">
                   <Image
-                    src="/lagos-continental.png"
+                    src={hotel.images[0]?.url || "/placeholder.svg"}
                     alt="Hotel exterior"
                     fill
                     className="object-cover"
@@ -102,9 +157,9 @@ export default function HotelInfoSheet({
                     variant="secondary"
                     size="sm"
                     className="absolute bottom-4 left-4 bg-white/90 hover:bg-white text-black"
-                    onClick={() => setIsPhotoGalleryOpen(true)}
+                    onClick={() => handlePhotoGalleryClick(hotel.hotel_name, hotel.images)}
                   >
-                    📷 See all photos (200)
+                    📷 See all photos ({hotel?.images.length})
                   </Button>
                 </div>
 
@@ -112,7 +167,7 @@ export default function HotelInfoSheet({
                 <div className="space-y-2">
                   <div className="relative h-[152px] rounded-lg overflow-hidden">
                     <Image
-                      src="/hotel-restaurant-interior.png"
+                      src={hotel.images[1]?.url || "/placeholder.svg"}
                       alt="Hotel restaurant"
                       fill
                       className="object-cover"
@@ -120,7 +175,7 @@ export default function HotelInfoSheet({
                   </div>
                   <div className="relative h-[152px] rounded-lg overflow-hidden">
                     <Image
-                      src="/elegant-hotel-lobby.png"
+                      src={hotel.images[2]?.url || "/placeholder.svg"}
                       alt="Hotel lobby"
                       fill
                       className="object-cover"
@@ -136,30 +191,15 @@ export default function HotelInfoSheet({
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h1 className="text-lg md:text-2xl font-bold">
-                      {hotelName}
+                      {hotel.hotel_name}
                     </h1>
-                    <Heart className="h-6 w-6 text-gray-400" />
                   </div>
-                  <p className="text-[#808080] mb-2">4-Star Hotel</p>
                   <div className="flex items-center gap-1 text-[#808080]">
                     <MapPin className="h-4 w-4" />
                     <span className="text-sm">
-                      3, Maroko Road, Lekki - Epe Express Way - Eti Osa, Lagos -
-                      Lagos
+                      {hotel.address}, {hotel.city_code}
                     </span>
                   </div>
-                </div>
-                <div className="md:text-right">
-                  <p className="text-sm text-[#808080] mb-1">Starting at</p>
-                  <p className="text-3xl font-bold text-blue-600">
-                    $95{" "}
-                    <span className="font-normal md:hidden text-sm text-[#808080]">
-                      per night
-                    </span>
-                  </p>
-                  <p className="text-sm text-[#808080] hidden md:flex">
-                    per night
-                  </p>
                 </div>
               </div>
 
@@ -183,57 +223,10 @@ export default function HotelInfoSheet({
                     {/* Rating Section */}
                     <div>
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="text-2xl font-medium">4.0</span>
-                        <Star className="h-6 w-6 fill-[#FC5D01] text-[#FC5D01]" />
+                        <span className="text-2xl font-medium">{hotel?.category.toFixed(1)}</span>
+                        <StarRating rating={hotel?.category || 0} />
                       </div>
-                      <p className="text-[#808080] mb-4">53 ratings</p>
 
-                      {/* Rating Breakdown */}
-                      <div className="space-y-2">
-                        {ratingData.map((rating) => (
-                          <div
-                            key={rating.stars}
-                            className="flex items-center gap-2"
-                          >
-                            <span className="text-sm w-2">{rating.stars}</span>
-                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-[#FC5D01] rounded-full"
-                                style={{ width: `${rating.percentage}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <Card className="p-4 border-none shadow-none">
-                        <div className="flex items-start gap-4">
-                          <div className="flex-1">
-                            <div className="flex flex-col mb-2">
-                              <div className="text-right">
-                                <StarRating rating={5} />
-                              </div>
-                              <div className="flex gap-4 items-center">
-                                <h5 className=" text-[#666666] text-sm">
-                                  Emma Williams
-                                </h5>
-                                <div className="flex items-center gap-2 text-sm text-[#666666]">
-                                  <p className="text-sm text-[#666666] mt-1">
-                                    2 weeks ago
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-
-                            <p className="text-gray-700 text-sm mb-4 leading-relaxed">
-                              We had an amazing family vacation at this hotel.
-                              The kids loved the pool area and the staff was
-                              very accommodating with our requests. The rooms
-                              were comfortable and the housekeeping service was
-                              impeccable. We'll definitely be back!
-                            </p>
-                          </div>
-                        </div>
-                      </Card>
                     </div>
 
                     {/* Top Amenities */}
@@ -266,23 +259,18 @@ export default function HotelInfoSheet({
                 <TabsContent value="about">
                   <div className="space-y-4">
                     <h4 className="text-lg font-medium text-[#4D4D4D]">
-                      Hotel Features
+                      Hotel Description
                     </h4>
                     <p className="text-xs md:text-sm text-[#666666]">
-                      Offering an outdoor pool and barbecue, Lagos Oriental
-                      Hotel is located in Lagos. The hotel has a terrace and
-                      fitness center, and guests can enjoy a drink at the bar.
-                      Free private parking is available on site. Every room at
-                      this hotel is air conditioned and comes with a flat-screen
-                      TV. Lagos Oriental Hotel features free WiFi . There is a
-                      24-hour front desk at the property. The hotel also offers
-                      car hire. The nearest airport is Murtala Muhammed
-                      International Airport, 13 mi from the property.
+                      {/* {hotel.description} */}
+                      <span dangerouslySetInnerHTML={{ __html: hotel?.description }} />
                     </p>
                   </div>
                 </TabsContent>
                 <TabsContent value="amenities">
-                  <HotelAmenities />
+                      {hotel?.facilities && (
+                        <FacilityList facilities={hotel.facilities} />
+                      )}
                 </TabsContent>
                 <TabsContent value="reviews">
                   {/* Rating Section */}
@@ -291,7 +279,7 @@ export default function HotelInfoSheet({
                   <HotelReviews />
                 </TabsContent>
                 <TabsContent value="map">
-                  <HotelMap name={hotelName} />
+                 
                 </TabsContent>
               </Tabs>
             </div>
@@ -303,8 +291,12 @@ export default function HotelInfoSheet({
 
       <PhotoInfo
         isOpen={isPhotoGalleryOpen}
-        onClose={() => setIsPhotoGalleryOpen(false)}
-        hotelName={hotelName}
+        onClose={() => {
+          setIsPhotoGalleryOpen(false);
+          setCurrentHotelForGallery(null);
+        }}
+        hotelName={selectedHotelForGallery?.hotelName}
+        images={selectedHotelForGallery?.images || []}
       />
     </>
   );

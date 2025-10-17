@@ -3,19 +3,28 @@ import HotelSearchForm from "@/components/hotel-search-form";
 import HotelFilters from "@/components/hotel-filters";
 import HotelResults from "@/components/hotel-results";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { Filter, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 
-export default function HotelsPage() {
-
+// Create a separate component that uses useSearchParams
+function HotelsContent() {
   const [showFilters, setShowFilters] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<any[]>([]);
+  
+  const router = useRouter();
+  const params = useSearchParams();
+
+  useEffect(() => {
+    setShowFilters(false);
+  }, [params]);
 
   return (
-
     <div className="min-h-screen bg-white">
       <div className="bg-[#F8F9FA] border-b py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <HotelSearchForm />
+          <HotelSearchForm setLoading={setLoading} setResults={setResults} />
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -64,11 +73,27 @@ export default function HotelsPage() {
           )}
 
           <div className="flex-1">
-            <HotelResults />
+            <HotelResults loading={loading} results={results} />
           </div>
         </div>
       </div>
     </div>
-    
   );
 }
+
+const HotelsPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading hotels...</p>
+        </div>
+      </div>
+    }>
+      <HotelsContent />
+    </Suspense>
+  );
+}
+
+export default HotelsPage;
