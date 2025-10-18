@@ -3,12 +3,7 @@ import BookingForm from "./booking-form";
 
 export function HeroSection() {
   return (
-    <section
-      className="relative min-h-[600px]  bg-[#F8F9FA] flex-col flex items-center justify-center"
-      // style={{
-      //   backgroundImage: "url('/hero.png')",
-      // }}
-    >
+    <section className="relative min-h-[600px]  bg-[#F8F9FA] flex-col flex items-center justify-center">
       <div className="h-[600px] overflow-hidden w-full relative">
         <Image src={"/hero.png"} alt="hero" fill className="object-cover" />
       </div>
