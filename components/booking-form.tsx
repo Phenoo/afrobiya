@@ -355,8 +355,6 @@ export default function BookingForm() {
       }
     });
 
-    //console.log("URL params:", params.toString());
-
     // Navigate to hotels page with query parameters
     router.push(`/hotels?${params.toString()}`);
   };
@@ -641,7 +639,7 @@ export default function BookingForm() {
               )}
 
               {/* Date Selection */}
-              <div className="hidden md:flex flex-col sm:flex-row gap-2 mb-4">
+              <div className="flex flex-col sm:flex-row gap-2 mb-4">
                 <div className="flex-1">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -704,7 +702,7 @@ export default function BookingForm() {
               </div>
 
               {/* Rooms Configuration */}
-              <div className="hidden md:block space-y-4 mb-4">
+              <div className="block space-y-4 mb-4">
                 {rooms.map((room, index) => (
                   <div
                     key={index}
@@ -853,7 +851,7 @@ export default function BookingForm() {
               </div>
 
               {/* Currency and Nationality Selection */}
-              <div className="hidden md:block mb-6">
+              <div className=" mb-6">
                 <CurrencyNationalitySelector
                   selectedCurrency={currency}
                   selectedNationality={nationality}
