@@ -365,6 +365,7 @@ export default function BookingForm() {
         {/* Navigation Tabs */}
         <div className="flex gap-2 mb-8 overflow-x-auto scrollbar-hide">
           <Button
+            type="button"
             variant={activeTab === "flights" ? "default" : "ghost"}
             className={`flex items-center gap-2 text-xs md:text-sm px-4 sm:px-6 py-3 sm:py-5 rounded-full whitespace-nowrap ${
               activeTab === "flights"
@@ -674,6 +675,7 @@ export default function BookingForm() {
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
+                        type="button"
                         className="w-full justify-start text-xs text-left font-normal py-3 px-4 h-auto border-gray-300 rounded-lg bg-transparent hover:bg-gray-50"
                       >
                         <CalendarIcon className="mr-2 h-5 w-5 text-gray-400" />
@@ -747,6 +749,7 @@ export default function BookingForm() {
                           </div>
                           <Button
                             variant="outline"
+                            type="button"
                             size="sm"
                             className="flex-1 h-8 p-0 rounded bg-[#E6E6E6] hover:bg-gray-200"
                             onClick={() =>
@@ -864,7 +867,6 @@ export default function BookingForm() {
               <Button
                 type="submit"
                 className="w-full py-4 text-base font-medium bg-[#0000FF] hover:bg-blue-700 rounded-lg transition-colors duration-200"
-                disabled={!watch("destinationCode")}
               >
                 Search Hotels
               </Button>
