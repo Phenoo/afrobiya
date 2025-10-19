@@ -595,16 +595,7 @@ export default function BookingForm() {
                             className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors duration-150"
                             onClick={() => handleDestinationSelect(destination)}
                           >
-                            <div
-                              className="flex items-center gap-3"
-                              onClick={() => {
-                                //@ts-ignore
-                                const params = new URLSearchParams({
-                                  destinationDisplay: `${destination.City}, ${destination.Country}`,
-                                });
-                                router.push(`/hotels?${params.toString()}`);
-                              }}
-                            >
+                            <div className="flex items-center gap-3">
                               <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
                               <div className="text-sm font-medium text-gray-900">
                                 {destination.City !== null &&

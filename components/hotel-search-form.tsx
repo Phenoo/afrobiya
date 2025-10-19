@@ -163,8 +163,6 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
 
     setValue("rooms", parsedRooms);
     setRooms(parsedRooms);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
   const fetchHotels = useCallback(() => {
@@ -444,6 +442,8 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
     });
 
     console.log("URL params:", params.toString());
+
+    setIsExpanded(false);
 
     // Navigate to hotels page with query parameters
     router.push(`/hotels?${params.toString()}`);
@@ -811,9 +811,6 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
             className={`h-10 bg-blue-600 hover:bg-blue-700 ${
               isMobile ? "w-full mt-2" : "w-48"
             }`}
-            onClick={() => {
-              setIsExpanded(false);
-            }}
           >
             Search Hotels
           </Button>
