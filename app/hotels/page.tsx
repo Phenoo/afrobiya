@@ -74,6 +74,8 @@ function HotelsContent() {
                 <X className="h-4 w-4" />
               </Button>
             </div>
+            <HotelFilters onFiltersApply={() => setShowFilters(false)} />
+
             <Sheet
               open={showFilters}
               defaultOpen={showFilters}
@@ -88,13 +90,6 @@ function HotelsContent() {
               </SheetContent>
             </Sheet>
           </div>
-
-          {showFilters && (
-            <div
-              className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
-              onClick={() => setShowFilters(false)}
-            />
-          )}
 
           <div className="flex-1">
             <HotelResults loading={loading} results={results} />
