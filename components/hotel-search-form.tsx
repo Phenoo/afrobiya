@@ -1,10 +1,12 @@
-import React, { useState, useEffect, FC, useRef, useCallback } from "react";
+"use client";
+
+import type React from "react";
+import { useState, useEffect, type FC, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { ChevronDownIcon, Minus, Plus, Search, X, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { format } from "date-fns";
 import {
   Popover,
@@ -115,7 +117,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
       nationality: params.get("nationality") || "NG",
       destinationCode: params.get("destination") || "",
       totalRooms: params.get("totalRooms")
-        ? parseInt(params.get("totalRooms") || "1")
+        ? Number.parseInt(params.get("totalRooms") || "1")
         : 1,
     },
   });
@@ -131,6 +133,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
   >([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDesktopExpanded, setIsDesktopExpanded] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [AllHotels, setAllHotels] = useState<string[]>([]);
 
@@ -148,15 +151,15 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
   }, [setLoading, setResults]);
 
   useEffect(() => {
-    const totalRooms = parseInt(params.get("totalRooms") || "1", 10);
+    const totalRooms = Number.parseInt(params.get("totalRooms") || "1", 10);
 
     const parsedRooms: any[] = [];
     for (let i = 1; i <= totalRooms; i++) {
-      const adults = parseInt(params.get(`adult${i}`) || "1", 10);
-      const children = parseInt(params.get(`children${i}`) || "0", 10);
+      const adults = Number.parseInt(params.get(`adult${i}`) || "1", 10);
+      const children = Number.parseInt(params.get(`children${i}`) || "0", 10);
       const childrenAgesParam = params.get(`childrenAges${i}`);
       const childrenAges = childrenAgesParam
-        ? childrenAgesParam.split(",").map((age) => parseInt(age, 10))
+        ? childrenAgesParam.split(",").map((age) => Number.parseInt(age, 10))
         : [];
       parsedRooms.push({ id: i, adults, children, childrenAges });
     }
@@ -179,7 +182,11 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
     formData.append("roomBasis", params.get("roomBasis") || "");
     formData.append("starLevels", params.get("starLevels") || "");
 
-    for (let i = 1; i <= parseInt(params.get("totalRooms") || "1"); i++) {
+    for (
+      let i = 1;
+      i <= Number.parseInt(params.get("totalRooms") || "1");
+      i++
+    ) {
       formData.append(`adult${i}`, params.get(`adult${i}`) || "1");
       formData.append(`children${i}`, params.get(`children${i}`) || "0");
       formData.append(`childrenAges${i}`, params.get(`childrenAges${i}`) || "");
@@ -444,11 +451,202 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
     console.log("URL params:", params.toString());
 
     setIsExpanded(false);
+    setIsDesktopExpanded(false);
 
     // Navigate to hotels page with query parameters
     router.push(`/hotels?${params.toString()}`);
     // Handle form submission - navigate to search results page
   };
+
+  const renderCompactForm = () => (
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+      <div className="flex gap-4 w-full items-end">
+        {/* City Search */}
+        <div className="flex-1">
+          <label className="block text-[#808080] mb-1 text-sm">
+            Destination
+          </label>
+          <div className="relative w-full" ref={dropdownRef}>
+            <Input
+              {...register("destination", {
+                required: "Destination is required",
+                minLength: {
+                  value: 2,
+                  message: "Destination must be at least 2 characters",
+                },
+              })}
+              className="pr-8 h-10 w-full"
+              placeholder="Enter city or hotel name"
+              onFocus={() => setShowDropdown(true)}
+              autoComplete={undefined}
+              onChange={(e) => {
+                setValue("destination", e.target.value);
+                if (e.target.value) {
+                  setShowDropdown(true);
+                }
+              }}
+            />
+            <Search className="absolute right-2.5 top-2.5 h-4 w-4 text-[#666666]" />
+
+            {/* Enhanced Dropdown */}
+            {showDropdown && (
+              <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20 mt-1 overflow-hidden w-full">
+                {isSearching ? (
+                  <div className="px-4 py-3 text-sm text-gray-500 flex items-center gap-2 w-full">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                    Searching destinations...
+                  </div>
+                ) : filteredDestinations.length > 0 ? (
+                  <div className="max-h-80 overflow-y-auto w-full">
+                    {filteredDestinations.map((destination) => (
+                      <div
+                        key={destination.CityId}
+                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors duration-150 w-full"
+                        onClick={() => handleDestinationSelect(destination)}
+                      >
+                        <div className="flex items-center gap-3 w-full">
+                          <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                          <div className="text-sm font-medium text-gray-900 flex-1 min-w-0">
+                            {destination.City !== null &&
+                              destination?.City.toUpperCase()}{" "}
+                            {destination?.Country.toUpperCase()} -{" "}
+                            {destination?.IsoCode}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : destinationValue ? (
+                  <div className="px-4 py-4 text-center text-gray-500 w-full">
+                    <MapPin className="w-5 h-5 mx-auto mb-1 text-gray-300" />
+                    <p className="text-sm">No destinations found</p>
+                    <p className="text-xs mt-1">Try different keywords</p>
+                  </div>
+                ) : (
+                  <div className="px-4 py-4 text-center text-gray-500 w-full">
+                    <Search className="w-5 h-5 mx-auto mb-1 text-gray-300" />
+                    <p className="text-sm">
+                      Start typing to search destinations
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          {errors.destination && (
+            <p className="text-red-500 text-xs mt-1 w-full">
+              {errors.destination.message}
+            </p>
+          )}
+        </div>
+
+        {/* Check In Date */}
+        <div className="flex-1">
+          <label className="block text-[#808080] mb-1 text-sm">Check in</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-start text-left font-normal h-10 bg-transparent"
+              >
+                {formatDate(checkInValue)}
+                <ChevronDownIcon className="ml-auto h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto p-0"
+              align="start"
+              side="bottom"
+              sideOffset={4}
+            >
+              <Calendar
+                mode="single"
+                selected={checkInValue}
+                onSelect={(date) => {
+                  setValue("checkIn", date as Date);
+                  setOpenIn(false);
+                }}
+                disabled={(date) =>
+                  date < new Date(new Date().setHours(0, 0, 0, 0))
+                }
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          {errors.checkIn && (
+            <p className="text-red-500 text-xs mt-1 w-full">
+              Check-in date is required
+            </p>
+          )}
+        </div>
+
+        {/* Check Out Date */}
+        <div className="flex-1">
+          <label className="block text-[#808080] mb-1 text-sm">Check out</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-start text-left font-normal h-10 bg-transparent"
+              >
+                {formatDate(checkOutValue)}
+                <ChevronDownIcon className="ml-auto h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto p-0"
+              align="start"
+              side="bottom"
+              sideOffset={4}
+            >
+              <Calendar
+                mode="single"
+                selected={checkOutValue}
+                onSelect={(date) => {
+                  setValue("checkOut", date as Date);
+                  setOpen(false);
+                }}
+                disabled={(date) => !checkInValue || date <= checkInValue}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          {errors.checkOut && (
+            <p className="text-red-500 text-xs mt-1 w-full">
+              Check-out date is required
+            </p>
+          )}
+        </div>
+
+        {/* Guests & Rooms Summary */}
+        <div className="flex-1">
+          <label className="block text-[#808080] mb-1 text-sm">
+            Guests & Rooms
+          </label>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full justify-start text-left font-normal h-10 bg-transparent"
+            onClick={() => setIsDesktopExpanded(true)}
+          >
+            {totalGuests} guest{totalGuests !== 1 && "s"} • {rooms.length} room
+            {rooms.length !== 1 && "s"}
+            <ChevronDownIcon className="ml-auto h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Search Button */}
+        <Button
+          type="submit"
+          className="h-10 bg-blue-600 hover:bg-blue-700 px-6"
+        >
+          Search
+        </Button>
+      </div>
+    </form>
+  );
 
   const renderFullForm = (isMobile = false) => (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full">
@@ -553,15 +751,21 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    onClick={() => setOpen(true)}
                     type="button"
                     variant="outline"
-                    className="w-full justify-start text-left font-normal h-10"
+                    className="w-full justify-start text-left font-normal h-10 bg-transparent"
                   >
                     {formatDate(checkInValue)}
                     <ChevronDownIcon className="ml-auto h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent
+                  className="w-auto p-0"
+                  align="start"
+                  side="bottom"
+                  sideOffset={4}
+                >
                   <Calendar
                     mode="single"
                     selected={checkInValue}
@@ -592,13 +796,18 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full justify-start text-left font-normal h-10"
+                    className="w-full justify-start text-left font-normal h-10 bg-transparent"
                   >
                     {formatDate(checkOutValue)}
                     <ChevronDownIcon className="ml-auto h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent
+                  className="w-auto p-0"
+                  align="start"
+                  side="bottom"
+                  sideOffset={4}
+                >
                   <Calendar
                     mode="single"
                     selected={checkOutValue}
@@ -713,7 +922,11 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
                           key={childIndex}
                           value={age.toString()}
                           onValueChange={(value) =>
-                            updateChildAge(room.id, childIndex, parseInt(value))
+                            updateChildAge(
+                              room.id,
+                              childIndex,
+                              Number.parseInt(value)
+                            )
                           }
                         >
                           <SelectTrigger className="h-8 text-xs min-w-[100px] flex-1">
@@ -844,9 +1057,25 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
         </Button>
       </div>
 
-      {/* Desktop View */}
+      {/* Desktop View - Collapsed by default */}
       <div className="hidden md:flex bg-white p-6 rounded-lg border border-gray-200 shadow-sm w-full">
-        {renderFullForm(false)}
+        {!isDesktopExpanded ? (
+          renderCompactForm()
+        ) : (
+          <div className="w-full">
+            <div className="flex items-center justify-between mb-6 w-full">
+              <h2 className="text-lg font-semibold">Edit your search</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsDesktopExpanded(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            {renderFullForm(false)}
+          </div>
+        )}
       </div>
 
       {/* Mobile Expanded View */}
