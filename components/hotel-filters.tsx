@@ -11,22 +11,33 @@ interface HotelFiltersProps {
 }
 
 export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
-
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // Initialize state from URL params or defaults
   const [budgetRange, setBudgetRange] = useState<[number, number]>([
-    Number(searchParams.get('minPrice')) || 50,
-    Number(searchParams.get('maxPrice')) || 1000000
+    Number(searchParams.get("minPrice")) || 50,
+    Number(searchParams.get("maxPrice")) || 1000000,
   ]);
-  
+
   const [selectedRoomBasis, setSelectedRoomBasis] = useState<string[]>(
-    searchParams.get('roomBasis')?.split(',') || []
+    searchParams.get("roomBasis")?.split(",") || []
   );
-  
+
   const [selectedStarLevels, setSelectedStarLevels] = useState<number[]>(
-    searchParams.get('starLevels')?.split(',').map(Number) || []
+    searchParams.get("starLevels")?.split(",").map(Number) || []
+  );
+
+  const [selectedBeds, setSelectedBeds] = useState<string[]>(
+    searchParams.get("beds")?.split(",") || []
+  );
+
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>(
+    searchParams.get("amenities")?.split(",") || []
+  );
+
+  const [selectedRatings, setSelectedRatings] = useState<number[]>(
+    searchParams.get("ratings")?.split(",").map(Number) || []
   );
 
   const roomBasisOptions = [
@@ -45,7 +56,41 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
     { id: 2, label: 2, count: 0 },
     { id: 3, label: 3, count: 35 },
     { id: 4, label: 4, count: 49 },
-    { id: 5, label: 5, count: 135 }
+    { id: 5, label: 5, count: 135 },
+  ];
+
+  const guestRatings = [
+    { id: 1, label: 1, count: 6 },
+    { id: 2, label: 2, count: 0 },
+    { id: 3, label: 3, count: 35 },
+    { id: 4, label: 4, count: 49 },
+    { id: 5, label: 5, count: 135 },
+  ];
+
+  const bedOptions = [
+    { id: "1bed", label: "1 Bed", count: 478 },
+    { id: "2beds", label: "2 Beds", count: 892 },
+    { id: "3plus", label: "3+ Beds", count: 201 },
+  ];
+
+  const amenitiesOptions = [
+    { id: "wifi", label: "Free Internet Access", count: 645 },
+    { id: "breakfast", label: "Free Breakfast", count: 443 },
+    { id: "parking", label: "Free Parking", count: 498 },
+    { id: "pets", label: "Pets Allowed", count: 102 },
+    { id: "pool", label: "Swimming Pool", count: 225 },
+    { id: "shuttle", label: "Airport Shuttle", count: 235 },
+    { id: "spa", label: "Spa", count: 155 },
+    { id: "restaurant", label: "Restaurant", count: 382 },
+    { id: "casino", label: "Casino", count: 8 },
+    { id: "smoking", label: "No Smoking Rooms/Facilities", count: 692 },
+    { id: "accessible", label: "Accessible Rooms/Facilities", count: 189 },
+    { id: "gym", label: "Fitness Center", count: 216 },
+    { id: "business", label: "Business Center", count: 98 },
+    { id: "inclusive", label: "All Inclusive", count: 9 },
+    { id: "waterfront", label: "Waterfront", count: 12 },
+    { id: "adults", label: "Adults Only", count: 47 },
+    { id: "hot-tub", label: "Hot Tub/Whirlpool", count: 83 },
   ];
 
   const handleBudgetChange = (value: number[]) => {
@@ -60,7 +105,7 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
     const newRoomBasis = checked
       ? [...selectedRoomBasis, option]
       : selectedRoomBasis.filter((o) => o !== option);
-    
+
     setSelectedRoomBasis(newRoomBasis);
   };
 
@@ -72,7 +117,7 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
     const newStarLevels = checked
       ? [...selectedStarLevels, level]
       : selectedStarLevels.filter((l) => l !== level);
-    
+
     setSelectedStarLevels(newStarLevels);
   };
 
@@ -80,41 +125,98 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
     setSelectedStarLevels([]);
   };
 
+  const handleBedsChange = (bedId: string, checked: boolean) => {
+    const newBeds = checked
+      ? [...selectedBeds, bedId]
+      : selectedBeds.filter((b) => b !== bedId);
+
+    setSelectedBeds(newBeds);
+  };
+
+  const clearBedsFilter = () => {
+    setSelectedBeds([]);
+  };
+
+  const handleAmenitiesChange = (amenityId: string, checked: boolean) => {
+    const newAmenities = checked
+      ? [...selectedAmenities, amenityId]
+      : selectedAmenities.filter((a) => a !== amenityId);
+
+    setSelectedAmenities(newAmenities);
+  };
+
+  const clearAmenitiesFilter = () => {
+    setSelectedAmenities([]);
+  };
+
+  const handleRatingsChange = (rating: number, checked: boolean) => {
+    const newRatings = checked
+      ? [...selectedRatings, rating]
+      : selectedRatings.filter((r) => r !== rating);
+
+    setSelectedRatings(newRatings);
+  };
+
+  const clearRatingsFilter = () => {
+    setSelectedRatings([]);
+  };
+
   const handleApplyFilters = () => {
     // Create new URLSearchParams with existing search params
     const newParams = new URLSearchParams(searchParams.toString());
-    
+
     // Update roomBasis parameter (comma-separated)
     if (selectedRoomBasis.length > 0) {
-      newParams.set('roomBasis', selectedRoomBasis.join(','));
+      newParams.set("roomBasis", selectedRoomBasis.join(","));
     } else {
-      newParams.delete('roomBasis');
+      newParams.delete("roomBasis");
     }
-    
+
     // Update starLevels parameter (comma-separated)
     if (selectedStarLevels.length > 0) {
-      newParams.set('starLevels', selectedStarLevels.join(','));
+      newParams.set("starLevels", selectedStarLevels.join(","));
     } else {
-      newParams.delete('starLevels');
+      newParams.delete("starLevels");
     }
-    
+
+    if (selectedBeds.length > 0) {
+      newParams.set("beds", selectedBeds.join(","));
+    } else {
+      newParams.delete("beds");
+    }
+
+    if (selectedAmenities.length > 0) {
+      newParams.set("amenities", selectedAmenities.join(","));
+    } else {
+      newParams.delete("amenities");
+    }
+
+    if (selectedRatings.length > 0) {
+      newParams.set("ratings", selectedRatings.join(","));
+    } else {
+      newParams.delete("ratings");
+    }
+
     // Update price range parameters
-    newParams.set('minPrice', budgetRange[0].toString());
-    newParams.set('maxPrice', budgetRange[1].toString());
-    
+    newParams.set("minPrice", budgetRange[0].toString());
+    newParams.set("maxPrice", budgetRange[1].toString());
+
     // Update URL without page reload
     router.push(`?${newParams.toString()}`, { scroll: false });
-    
+
     // Call parent callback if provided
     if (onFiltersApply) {
       onFiltersApply();
     }
-    
-    console.log('Applied filters:', {
+
+    console.log("Applied filters:", {
       roomBasis: selectedRoomBasis,
       starLevels: selectedStarLevels,
+      beds: selectedBeds,
+      amenities: selectedAmenities,
+      ratings: selectedRatings,
       minPrice: budgetRange[0],
-      maxPrice: budgetRange[1]
+      maxPrice: budgetRange[1],
     });
   };
 
@@ -123,17 +225,23 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
     setBudgetRange([50, 1000000]);
     setSelectedRoomBasis([]);
     setSelectedStarLevels([]);
-    
+    setSelectedBeds([]);
+    setSelectedAmenities([]);
+    setSelectedRatings([]);
+
     // Create new URLSearchParams without filter parameters
     const newParams = new URLSearchParams(searchParams.toString());
-    newParams.delete('roomBasis');
-    newParams.delete('starLevels');
-    newParams.delete('minPrice');
-    newParams.delete('maxPrice');
-    
+    newParams.delete("roomBasis");
+    newParams.delete("starLevels");
+    newParams.delete("beds");
+    newParams.delete("amenities");
+    newParams.delete("ratings");
+    newParams.delete("minPrice");
+    newParams.delete("maxPrice");
+
     // Update URL
     router.push(`?${newParams.toString()}`, { scroll: false });
-    
+
     // Call parent callback if provided
     if (onFiltersApply) {
       onFiltersApply();
@@ -176,6 +284,43 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
         </div>
       </div>
 
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
+          <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest">
+            Number of Beds
+          </h3>
+          <div
+            className="flex items-center justify-center cursor-pointer"
+            onClick={clearBedsFilter}
+          >
+            <Image
+              src={"/Fundamental Button.svg"}
+              alt="Clear beds filter"
+              width={25}
+              height={25}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
+          {bedOptions.map((option) => (
+            <div key={option.id} className="flex items-center space-x-3">
+              <Checkbox
+                id={option.id}
+                checked={selectedBeds.includes(option.id)}
+                onCheckedChange={(checked) =>
+                  handleBedsChange(option.id, checked as boolean)
+                }
+              />
+              <label htmlFor={option.id} className="text-sm text-[#666666]">
+                {option.label}
+              </label>
+              <span className="text-xs text-[#999999]">({option.count})</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Room Basis */}
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
@@ -188,7 +333,7 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
           >
             <Image
               src={"/Fundamental Button.svg"}
-              alt="logo"
+              alt="Clear room basis filter"
               width={25}
               height={25}
             />
@@ -205,8 +350,47 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
                   handleRoomBasisChange(option.code, checked as boolean)
                 }
               />
-              <label htmlFor={option.code} className="text-sm text-[#666666]">
-                {option.description}
+              <label
+                htmlFor={option.code}
+                className="text-sm text-[#666666] capitalize"
+              >
+                {option.description.toLowerCase()}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
+          <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest">
+            Amenities
+          </h3>
+          <div
+            className="flex items-center justify-center cursor-pointer"
+            onClick={clearAmenitiesFilter}
+          >
+            <Image
+              src={"/Fundamental Button.svg"}
+              alt="Clear amenities filter"
+              width={25}
+              height={25}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
+          {amenitiesOptions.map((option) => (
+            <div key={option.id} className="flex items-center space-x-3">
+              <Checkbox
+                id={option.id}
+                checked={selectedAmenities.includes(option.id)}
+                onCheckedChange={(checked) =>
+                  handleAmenitiesChange(option.id, checked as boolean)
+                }
+              />
+              <label htmlFor={option.id} className="text-sm text-[#666666]">
+                {option.label}
               </label>
             </div>
           ))}
@@ -225,7 +409,7 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
           >
             <Image
               src={"/Fundamental Button.svg"}
-              alt="logo"
+              alt="Clear star level filter"
               width={25}
               height={25}
             />
@@ -252,7 +436,60 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
                   />
                 ))}
                 {Array.from({ length: 5 - level.label }, (_, i) => (
-                  <Star key={i + level.label} className="w-4 h-4 text-[#FC5D01]" />
+                  <Star
+                    key={i + level.label}
+                    className="w-4 h-4 text-[#FC5D01]"
+                  />
+                ))}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
+          <h3 className="text-xs font-medium text-[#808080] uppercase tracking-widest">
+            Guest Rating
+          </h3>
+          <div
+            className="flex items-center justify-center cursor-pointer"
+            onClick={clearRatingsFilter}
+          >
+            <Image
+              src={"/Fundamental Button.svg"}
+              alt="Clear guest rating filter"
+              width={25}
+              height={25}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
+          {guestRatings.map((level) => (
+            <div key={level.id} className="flex items-center space-x-3">
+              <Checkbox
+                id={`star-${level.id}`}
+                checked={selectedRatings.includes(level.id)}
+                onCheckedChange={(checked) =>
+                  handleRatingsChange(level.id, checked as boolean)
+                }
+              />
+              <label
+                htmlFor={`star-${level.id}`}
+                className="flex items-center gap-1"
+              >
+                {Array.from({ length: level.label }, (_, i) => (
+                  <Star
+                    key={i}
+                    className="w-4 h-4 fill-[#FC5D01] text-[#FC5D01]"
+                  />
+                ))}
+                {Array.from({ length: 5 - level.label }, (_, i) => (
+                  <Star
+                    key={i + level.label}
+                    className="w-4 h-4 text-[#FC5D01]"
+                  />
                 ))}
               </label>
             </div>
@@ -262,15 +499,15 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
 
       {/* Action Buttons */}
       <div className="space-y-3 pt-4">
-        <Button 
-          className="h-10 bg-blue-600 hover:bg-blue-700 w-full" 
+        <Button
+          className="h-10 bg-blue-600 hover:bg-blue-700 w-full"
           onClick={handleApplyFilters}
         >
           Apply Filters
         </Button>
-        <Button 
-          variant="outline" 
-          className="h-10 w-full" 
+        <Button
+          variant="outline"
+          className="h-10 w-full bg-transparent"
           onClick={handleClearAllFilters}
         >
           Clear All Filters
