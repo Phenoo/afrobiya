@@ -249,7 +249,7 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
   };
 
   return (
-    <div className="space-y-4 lg:space-y-6">
+    <div className="space-y-4 lg:space-y-6 overflow-y-scroll md:overflow-auto">
       {/* Budget Filter */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2 bg-[#F2F2F2] p-2">
