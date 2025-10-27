@@ -137,8 +137,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [AllHotels, setAllHotels] = useState<string[]>([]);
 
-  const destinationValue =
-    watch("destination") || params.get("destinationDisplay") || "";
+  const destinationValue = watch("destination") || params.get("destinationDisplay") || "";
   const checkInValue = watch("checkIn");
   const checkOutValue = watch("checkOut");
   const currencyValue = watch("currency");
@@ -181,12 +180,10 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
     formData.append("page", params.get("page") || "1");
     formData.append("roomBasis", params.get("roomBasis") || "");
     formData.append("starLevels", params.get("starLevels") || "");
+    formData.append("minPrice", params.get("minPrice") || "");
+    formData.append("maxPrice", params.get("maxPrice") || "");
 
-    for (
-      let i = 1;
-      i <= Number.parseInt(params.get("totalRooms") || "1");
-      i++
-    ) {
+    for (let i = 1; i <= Number.parseInt(params.get("totalRooms") || "1"); i++ ) {
       formData.append(`adult${i}`, params.get(`adult${i}`) || "1");
       formData.append(`children${i}`, params.get(`children${i}`) || "0");
       formData.append(`childrenAges${i}`, params.get(`childrenAges${i}`) || "");
@@ -201,6 +198,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("Fetched hotels:", data);
         settersRef.current.setResults(data);
         settersRef.current.setLoading(false);
       })

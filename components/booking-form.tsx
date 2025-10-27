@@ -576,7 +576,12 @@ export default function BookingForm() {
                 </div>
 
                 {/* Hidden inputs for form values */}
-                <input type="hidden" {...register("destinationCode")} />
+                <input 
+                  type="hidden" 
+                  {...register("destinationCode", {
+                    required: "Please select a destination"
+                  })} 
+                />
                 <input type="hidden" {...register("totalRooms")} />
 
                 {/* Enhanced Compact Dropdown */}
@@ -625,7 +630,7 @@ export default function BookingForm() {
                 )}
               </div>
               {errors.destinationCode && (
-                <div className="text-sm text-red-500 mb-2">
+                <div className="text-sm text-red-500 mb-2 text-left">
                   {errors.destinationCode.message}
                 </div>
               )}
