@@ -56,6 +56,8 @@ export default function BookingForm() {
     typeof destinations
   >([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [openCheckIn, setOpenCheckIn] = useState(false);
+  const [openCheckOut, setOpenCheckOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -633,7 +635,7 @@ export default function BookingForm() {
               {/* Date Selection */}
               <div className="flex flex-col sm:flex-row gap-2 mb-4">
                 <div className="flex-1">
-                  <Popover>
+                  <Popover open={openCheckIn} onOpenChange={setOpenCheckIn}>
                     <PopoverTrigger asChild>
                       <Button
                         type="button"
@@ -651,6 +653,7 @@ export default function BookingForm() {
                         onSelect={(date) => {
                           setCheckInDate(date as Date);
                           setValue("checkInDate", date as Date);
+                          setOpenCheckIn(false);
                         }}
                         disabled={(date) => date < new Date()}
                         initialFocus
@@ -662,7 +665,7 @@ export default function BookingForm() {
                   {calculateNights()} Night(s)
                 </div>
                 <div className="flex-1">
-                  <Popover>
+                  <Popover open={openCheckOut} onOpenChange={setOpenCheckOut}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -682,6 +685,7 @@ export default function BookingForm() {
                         onSelect={(date) => {
                           setCheckOutDate(date as Date);
                           setValue("checkOutDate", date as Date);
+                          setOpenCheckOut(false);
                         }}
                         disabled={(date) =>
                           date < new Date() ||

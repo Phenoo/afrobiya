@@ -543,7 +543,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
         {/* Check In Date */}
         <div className="flex-1">
           <label className="block text-[#808080] mb-1 text-sm">Check in</label>
-          <Popover>
+          <Popover open={openIn} onOpenChange={setOpenIn}>
             <PopoverTrigger asChild>
               <Button
                 type="button"
@@ -584,7 +584,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
         {/* Check Out Date */}
         <div className="flex-1">
           <label className="block text-[#808080] mb-1 text-sm">Check out</label>
-          <Popover>
+          <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
                 type="button"
@@ -748,10 +748,9 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
               <label className="block text-[#808080] mb-1 text-sm w-full">
                 Check in
               </label>
-              <Popover>
+              <Popover open={openIn} onOpenChange={setOpenIn}>
                 <PopoverTrigger asChild>
                   <Button
-                    onClick={() => setOpen(true)}
                     type="button"
                     variant="outline"
                     className="w-full justify-start text-left font-normal h-10 bg-transparent"
@@ -791,7 +790,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
               <label className="block text-[#808080] mb-1 text-sm w-full">
                 Check out
               </label>
-              <Popover>
+              <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     type="button"
