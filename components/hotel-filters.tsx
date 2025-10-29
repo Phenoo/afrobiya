@@ -17,7 +17,7 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
   // Initialize state from URL params or defaults
   const [budgetRange, setBudgetRange] = useState<[number, number]>([
     Number(searchParams.get("minPrice")) || 50,
-    Number(searchParams.get("maxPrice")) || 1000000,
+    Number(searchParams.get("maxPrice")) || 10000,
   ]);
 
   const [selectedRoomBasis, setSelectedRoomBasis] = useState<string[]>(
@@ -98,7 +98,7 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
   };
 
   const clearBudgetFilter = () => {
-    setBudgetRange([50, 1000000]);
+    setBudgetRange([50, 10000]);
   };
 
   const handleRoomBasisChange = (option: string, checked: boolean) => {
@@ -222,7 +222,7 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
 
   const handleClearAllFilters = () => {
     // Clear all local state
-    setBudgetRange([50, 1000000]);
+    setBudgetRange([50, 10000]);
     setSelectedRoomBasis([]);
     setSelectedStarLevels([]);
     setSelectedBeds([]);
@@ -272,9 +272,9 @@ export default function HotelFilters({ onFiltersApply }: HotelFiltersProps) {
           <Slider
             value={budgetRange}
             onValueChange={handleBudgetChange}
-            max={1000000}
+            max={10000}
             min={50}
-            step={1000}
+            step={10}
             className="w-full"
           />
           <div className="flex justify-between text-sm text-gray-600 mt-2">

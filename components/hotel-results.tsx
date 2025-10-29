@@ -43,6 +43,9 @@ const HotelResults = ({ loading, results }: { loading?: boolean; results: any })
     RoomBasis: string;
   } | undefined>(undefined);
   const [destinationname, setDestinationname] = useState<string | null>("");
+  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
+  const [filteredHotels, setFilteredHotels] = useState<any[]>([]);
+
 
   const router = useRouter();
   const params = useSearchParams();
@@ -80,9 +83,17 @@ const HotelResults = ({ loading, results }: { loading?: boolean; results: any })
 
     useEffect(() => {
       const destination = params.get("destinationDisplay");
-      if (destination) {
-        setDestinationname(destination);
-      }
+       const facilitiesParam = params.get("amenities");
+        if (destination) {
+          setDestinationname(destination);
+        }
+
+        if (facilitiesParam) {
+          const facilitiesArray = facilitiesParam.split(',').map(f => f.trim());
+          setSelectedFacilities(facilitiesArray);
+        } else {
+          setSelectedFacilities([]);
+        }
   }, [params]);
 
   //console.log("Hotelinfo:", selectedHotelForInfo);
@@ -126,25 +137,50 @@ const HotelResults = ({ loading, results }: { loading?: boolean; results: any })
     facilities: string[]; 
     maxFacilities?: number;
   }) {
-    // Determine which facilities to display
     const facilitiesToDisplay = maxFacilities 
       ? facilities.slice(0, maxFacilities)
       : facilities;
 
     return (
-      <div className="flex flex-col items-start gap-1 text-sm text-[#808080]">
+      <div className="flex flex-wrap gap-2">
         {facilitiesToDisplay.map((facility, index) => {
           const IconComponent = getFacilityIcon(facility);
           return (
-            <div key={index} className="flex items-center gap-1">
-              <IconComponent className="h-4 w-4" />
-              <span>{facility}</span>
+            <div
+              key={index}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-xs border border-gray-200 hover:bg-gray-200 transition-colors"
+            >
+              <IconComponent className="h-3 w-3 flex-shrink-0" />
+              <span className="whitespace-nowrap">{facility}</span>
             </div>
           );
         })}
       </div>
     );
   }
+
+    // Filter hotels based on selected facilities
+  useEffect(() => {
+    if (results?.hotels) {
+      if (selectedFacilities.length > 0) {
+        const filtered = results.hotels.filter((hotel: HotelType) => {
+          // Check if hotel has any of the selected facilities
+          return selectedFacilities.some(facility => 
+            hotel.hotelInfo?.facilities?.some((hotelFacility: string) => 
+              hotelFacility.toLowerCase().includes(facility.toLowerCase())
+            )
+          );
+        });
+        setFilteredHotels(filtered);
+      } else {
+        // If no facilities selected, show all hotels
+        setFilteredHotels(results.hotels);
+      }
+    } else {
+      setFilteredHotels([]);
+    }
+  }, [results, selectedFacilities]);
+
 
    const StarRating = ({ rating }: { rating: number }) => {
     return (
@@ -193,11 +229,10 @@ const HotelResults = ({ loading, results }: { loading?: boolean; results: any })
 
         {/* Hotel Cards */}
         <div className="space-y-4">
-          {results['hotels']?.map((hotel: HotelType, index: number) => (
+          {filteredHotels?.map((hotel: HotelType, index: number) => (
             <div
               key={hotel.HotelCode}
-              className="bg-white hover:border hover:border-[#0000ff] flex flex-col border rounded-lg overflow-hidden"
-            >
+              className="bg-white hover:border hover:border-[#333333] flex flex-col border rounded-lg overflow-hidden">
               <div className="flex flex-col lg:flex-row gap-0">
                 <div className="relative w-full lg:w-48 h-48 lg:h-60 flex-shrink-0">
                   <Image
