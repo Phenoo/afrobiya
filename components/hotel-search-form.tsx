@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { format } from "date-fns";
+import type { DateRange } from "react-day-picker";
 import {
   Popover,
   PopoverContent,
@@ -125,9 +126,16 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
   const [rooms, setRooms] = useState<Room[]>([]);
 
   const [nights, setNights] = useState(0);
-  const [open, setOpen] = useState(false);
-  const [openIn, setOpenIn] = useState(false);
+  const [dateRangeOpen, setDateRangeOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: params.get("checkIn")
+      ? new Date(params.get("checkIn")!)
+      : new Date(),
+    to: params.get("checkOut")
+      ? new Date(params.get("checkOut")!)
+      : new Date(Date.now() + 24 * 60 * 60 * 1000),
+  });
   const [filteredDestinations, setFilteredDestinations] = useState<
     typeof destinations
   >([]);
@@ -280,25 +288,22 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Calculate nights when dates change
+  // Calculate nights and sync with form when date range changes
   useEffect(() => {
-    if (checkInValue && checkOutValue) {
-      const timeDiff = checkOutValue.getTime() - checkInValue.getTime();
+    if (dateRange?.from && dateRange?.to) {
+      const timeDiff = dateRange.to.getTime() - dateRange.from.getTime();
       const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
       setNights(daysDiff > 0 ? daysDiff : 0);
-    } else {
+      
+      // Sync with form values
+      setValue("checkIn", dateRange.from);
+      setValue("checkOut", dateRange.to);
+    } else if (dateRange?.from) {
+      // If only from is selected, set checkIn
+      setValue("checkIn", dateRange.from);
       setNights(0);
     }
-  }, [checkInValue, checkOutValue]);
-
-  // Update checkOut when checkIn changes
-  useEffect(() => {
-    if (checkInValue && (!checkOutValue || checkOutValue <= checkInValue)) {
-      const nextDay = new Date(checkInValue);
-      nextDay.setDate(nextDay.getDate() + 1);
-      setValue("checkOut", nextDay);
-    }
-  }, [checkInValue, checkOutValue, setValue]);
+  }, [dateRange, setValue]);
 
   const formatDate = (date: Date | undefined) => {
     if (!date) return "Select date";
@@ -540,17 +545,27 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
           )}
         </div>
 
-        {/* Check In Date */}
+        {/* Date Range Picker */}
         <div className="flex-1">
-          <label className="block text-[#808080] mb-1 text-sm">Check in</label>
-          <Popover open={openIn} onOpenChange={setOpenIn}>
+          <label className="block text-[#808080] mb-1 text-sm">Dates</label>
+          <Popover open={dateRangeOpen} onOpenChange={setDateRangeOpen}>
             <PopoverTrigger asChild>
               <Button
                 type="button"
                 variant="outline"
                 className="w-full justify-start text-left font-normal h-10 bg-transparent"
               >
-                {formatDate(checkInValue)}
+                {dateRange?.from ? (
+                  dateRange.to ? (
+                    <>
+                      {formatDate(dateRange.from)} - {formatDate(dateRange.to)}
+                    </>
+                  ) : (
+                    formatDate(dateRange.from)
+                  )
+                ) : (
+                  "Select dates"
+                )}
                 <ChevronDownIcon className="ml-auto h-4 w-4" />
               </Button>
             </PopoverTrigger>
@@ -561,61 +576,26 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
               sideOffset={4}
             >
               <Calendar
-                mode="single"
-                selected={checkInValue}
-                onSelect={(date) => {
-                  setValue("checkIn", date as Date);
-                  setOpenIn(false);
+                mode="range"
+                selected={dateRange}
+                onSelect={(range) => {
+                  setDateRange(range);
+                  // Close popover when both dates are selected
+                  if (range?.from && range?.to) {
+                    setDateRangeOpen(false);
+                  }
                 }}
                 disabled={(date) =>
                   date < new Date(new Date().setHours(0, 0, 0, 0))
                 }
                 initialFocus
+                numberOfMonths={2}
               />
             </PopoverContent>
           </Popover>
           {errors.checkIn && (
             <p className="text-red-500 text-xs mt-1 w-full">
-              Check-in date is required
-            </p>
-          )}
-        </div>
-
-        {/* Check Out Date */}
-        <div className="flex-1">
-          <label className="block text-[#808080] mb-1 text-sm">Check out</label>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full justify-start text-left font-normal h-10 bg-transparent"
-              >
-                {formatDate(checkOutValue)}
-                <ChevronDownIcon className="ml-auto h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto p-0"
-              align="start"
-              side="bottom"
-              sideOffset={4}
-            >
-              <Calendar
-                mode="single"
-                selected={checkOutValue}
-                onSelect={(date) => {
-                  setValue("checkOut", date as Date);
-                  setOpen(false);
-                }}
-                disabled={(date) => !checkInValue || date <= checkInValue}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-          {errors.checkOut && (
-            <p className="text-red-500 text-xs mt-1 w-full">
-              Check-out date is required
+              Dates are required
             </p>
           )}
         </div>
@@ -740,91 +720,63 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
             )}
           </div>
 
-          {/* Date Selection */}
+          {/* Date Range Selection */}
           <div
-            className={`flex gap-4 ${isMobile ? "w-full" : "flex-1"} w-full`}
+            className={`${isMobile ? "w-full" : "flex-1"} w-full`}
           >
-            <div className="flex-1 w-full">
-              <label className="block text-[#808080] mb-1 text-sm w-full">
-                Check in
-              </label>
-              <Popover open={openIn} onOpenChange={setOpenIn}>
-                <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal h-10 bg-transparent"
-                  >
-                    {formatDate(checkInValue)}
-                    <ChevronDownIcon className="ml-auto h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto p-0"
-                  align="start"
-                  side="bottom"
-                  sideOffset={4}
+            <label className="block text-[#808080] mb-1 text-sm w-full">
+              Check-in - Check-out
+            </label>
+            <Popover open={dateRangeOpen} onOpenChange={setDateRangeOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal h-10 bg-transparent"
                 >
-                  <Calendar
-                    mode="single"
-                    selected={checkInValue}
-                    onSelect={(date) => {
-                      setValue("checkIn", date as Date);
-                      setOpenIn(false);
-                    }}
-                    disabled={(date) =>
-                      date < new Date(new Date().setHours(0, 0, 0, 0))
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {formatDate(dateRange.from)} - {formatDate(dateRange.to)}
+                      </>
+                    ) : (
+                      formatDate(dateRange.from)
+                    )
+                  ) : (
+                    "Select dates"
+                  )}
+                  <ChevronDownIcon className="ml-auto h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-auto p-0"
+                align="start"
+                side="bottom"
+                sideOffset={4}
+              >
+                <Calendar
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={(range) => {
+                    setDateRange(range);
+                    // Close popover when both dates are selected
+                    if (range?.from && range?.to) {
+                      setDateRangeOpen(false);
                     }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              {errors.checkIn && (
-                <p className="text-red-500 text-xs mt-1 w-full">
-                  Check-in date is required
-                </p>
-              )}
-            </div>
-
-            <div className="flex-1 w-full">
-              <label className="block text-[#808080] mb-1 text-sm w-full">
-                Check out
-              </label>
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal h-10 bg-transparent"
-                  >
-                    {formatDate(checkOutValue)}
-                    <ChevronDownIcon className="ml-auto h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto p-0"
-                  align="start"
-                  side="bottom"
-                  sideOffset={4}
-                >
-                  <Calendar
-                    mode="single"
-                    selected={checkOutValue}
-                    onSelect={(date) => {
-                      setValue("checkOut", date as Date);
-                      setOpen(false);
-                    }}
-                    disabled={(date) => !checkInValue || date <= checkInValue}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              {errors.checkOut && (
-                <p className="text-red-500 text-xs mt-1 w-full">
-                  Check-out date is required
-                </p>
-              )}
-            </div>
+                  }}
+                  disabled={(date) =>
+                    date < new Date(new Date().setHours(0, 0, 0, 0))
+                  }
+                  initialFocus
+                  numberOfMonths={2}
+                />
+              </PopoverContent>
+            </Popover>
+            {errors.checkIn && (
+              <p className="text-red-500 text-xs mt-1 w-full">
+                Dates are required
+              </p>
+            )}
           </div>
         </div>
 
@@ -1047,7 +999,9 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
                 {destinationValue}
               </p>
               <p className="text-xs text-gray-500 truncate">
-                {formatDate(checkInValue)} - {formatDate(checkOutValue)} •{" "}
+                {dateRange?.from && dateRange?.to
+                  ? `${formatDate(dateRange.from)} - ${formatDate(dateRange.to)}`
+                  : "Select dates"} •{" "}
                 {totalGuests} guest{totalGuests !== 1 && "s"} • {rooms.length}{" "}
                 room{rooms.length !== 1 && "s"}
               </p>
