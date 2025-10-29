@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
+import type { DateRange } from "react-day-picker";
 import Image from "next/image";
 import CurrencyNationalitySelector from "./CurrencyNationalitySelector";
 import { debounce } from "lodash";
@@ -56,6 +57,7 @@ export default function BookingForm() {
     typeof destinations
   >([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [dateRangeOpen, setDateRangeOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -78,10 +80,10 @@ export default function BookingForm() {
     },
   });
 
-  const [checkInDate, setCheckInDate] = useState<Date>(new Date());
-  const [checkOutDate, setCheckOutDate] = useState<Date>(
-    new Date(Date.now() + 24 * 60 * 60 * 1000)
-  );
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  });
   const [rooms, setRooms] = useState<Room[]>([
     { adults: 1, children: 0, childrenAges: [] },
   ]);
@@ -185,8 +187,8 @@ export default function BookingForm() {
   ];
 
   const calculateNights = () => {
-    if (checkInDate && checkOutDate) {
-      const diffTime = Math.abs(checkOutDate.getTime() - checkInDate.getTime());
+    if (dateRange?.from && dateRange?.to) {
+      const diffTime = Math.abs(dateRange.to.getTime() - dateRange.from.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return diffDays;
     }
@@ -321,8 +323,8 @@ export default function BookingForm() {
   const onSubmit = (data: FormData) => {
     //console.log("Form data:", data);
 
-    const checkIn = data.checkInDate || new Date();
-    let checkOut = data.checkOutDate;
+    const checkIn = dateRange?.from || new Date();
+    let checkOut = dateRange?.to;
 
     if (!checkOut || checkOut <= checkIn) {
       checkOut = new Date(checkIn.getTime() + 24 * 60 * 60 * 1000);
@@ -635,10 +637,10 @@ export default function BookingForm() {
                 </div>
               )}
 
-              {/* Date Selection */}
-              <div className="flex flex-col sm:flex-row gap-2 mb-4">
-                <div className="flex-1">
-                  <Popover>
+              {/* Date Range Selection */}
+              <div className="flex flex-col sm:flex-row gap-2 mb-4 items-center">
+                <div className="flex-1 w-full">
+                  <Popover open={dateRangeOpen} onOpenChange={setDateRangeOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         type="button"
@@ -646,56 +648,45 @@ export default function BookingForm() {
                         className="w-full justify-start text-xs text-left font-normal py-3 px-4 h-auto border-gray-300 rounded-lg bg-transparent hover:bg-gray-50"
                       >
                         <CalendarIcon className="mr-2 h-5 w-5 text-gray-400" />
-                        {checkInDate ? format(checkInDate, "PPP") : "Check in"}
+                        {dateRange?.from ? (
+                          dateRange.to ? (
+                            <>
+                              {format(dateRange.from, "PPP")} - {format(dateRange.to, "PPP")}
+                            </>
+                          ) : (
+                            format(dateRange.from, "PPP")
+                          )
+                        ) : (
+                          "Select dates"
+                        )}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <CalendarComponent
-                        mode="single"
-                        selected={checkInDate}
-                        onSelect={(date) => {
-                          setCheckInDate(date as Date);
-                          setValue("checkInDate", date as Date);
+                        mode="range"
+                        selected={dateRange}
+                        onSelect={(range) => {
+                          setDateRange(range);
+                          if (range?.from) {
+                            setValue("checkInDate", range.from);
+                          }
+                          if (range?.to) {
+                            setValue("checkOutDate", range.to);
+                          }
+                          // Close popover when both dates are selected
+                          if (range?.from && range?.to) {
+                            setDateRangeOpen(false);
+                          }
                         }}
                         disabled={(date) => date < new Date()}
                         initialFocus
+                        numberOfMonths={2}
                       />
                     </PopoverContent>
                   </Popover>
                 </div>
                 <div className="flex items-center justify-center px-2 py-3 rounded-lg text-sm text-[#808080] order-last sm:order-none">
                   {calculateNights()} Night(s)
-                </div>
-                <div className="flex-1">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        type="button"
-                        className="w-full justify-start text-xs text-left font-normal py-3 px-4 h-auto border-gray-300 rounded-lg bg-transparent hover:bg-gray-50"
-                      >
-                        <CalendarIcon className="mr-2 h-5 w-5 text-gray-400" />
-                        {checkOutDate
-                          ? format(checkOutDate, "PPP")
-                          : "Check out"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent
-                        mode="single"
-                        selected={checkOutDate}
-                        onSelect={(date) => {
-                          setCheckOutDate(date as Date);
-                          setValue("checkOutDate", date as Date);
-                        }}
-                        disabled={(date) =>
-                          date < new Date() ||
-                          (checkInDate && date <= checkInDate)
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
                 </div>
               </div>
 
