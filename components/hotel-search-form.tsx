@@ -129,9 +129,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
   const [dateRangeOpen, setDateRangeOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: params.get("checkIn")
-      ? new Date(params.get("checkIn")!)
-      : new Date(),
+    from: params.get("checkIn") ? new Date(params.get("checkIn")!) : new Date(),
     to: params.get("checkOut")
       ? new Date(params.get("checkOut")!)
       : new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -294,7 +292,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
       const timeDiff = dateRange.to.getTime() - dateRange.from.getTime();
       const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
       setNights(daysDiff > 0 ? daysDiff : 0);
-      
+
       // Sync with form values
       setValue("checkIn", dateRange.from);
       setValue("checkOut", dateRange.to);
@@ -721,9 +719,7 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
           </div>
 
           {/* Date Range Selection */}
-          <div
-            className={`${isMobile ? "w-full" : "flex-1"} w-full`}
-          >
+          <div className={`${isMobile ? "w-full" : "flex-1"} w-full`}>
             <label className="block text-[#808080] mb-1 text-sm w-full">
               Check-in - Check-out
             </label>
@@ -737,7 +733,8 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
                   {dateRange?.from ? (
                     dateRange.to ? (
                       <>
-                        {formatDate(dateRange.from)} - {formatDate(dateRange.to)}
+                        {formatDate(dateRange.from)} -{" "}
+                        {formatDate(dateRange.to)}
                       </>
                     ) : (
                       formatDate(dateRange.from)
@@ -1000,9 +997,11 @@ const HotelSearchForm: React.FC<HotelSearchFormProps> = ({
               </p>
               <p className="text-xs text-gray-500 truncate">
                 {dateRange?.from && dateRange?.to
-                  ? `${formatDate(dateRange.from)} - ${formatDate(dateRange.to)}`
-                  : "Select dates"} •{" "}
-                {totalGuests} guest{totalGuests !== 1 && "s"} • {rooms.length}{" "}
+                  ? `${formatDate(dateRange.from)} - ${formatDate(
+                      dateRange.to
+                    )}`
+                  : "Select dates"}{" "}
+                • {totalGuests} guest{totalGuests !== 1 && "s"} • {rooms.length}{" "}
                 room{rooms.length !== 1 && "s"}
               </p>
             </div>
